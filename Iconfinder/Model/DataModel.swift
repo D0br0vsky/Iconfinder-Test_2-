@@ -1,15 +1,13 @@
 
 struct SearchResult: Codable {
-    let icons: [Icon]
+    let icons: [IconDTO]
 }
 
-// основная модель для работы с JSON
-
-struct Icon: Codable {
+struct IconDTO: Codable {
     let iconID: Int?
     let name: String?
     let tags: [String]?
-    let rasterSizes: [RasterSize]?
+    let rasterSizes: [RasterSizeDTO]?
 
     enum CodingKeys: String, CodingKey {
         case iconID = "icon_id"
@@ -19,10 +17,10 @@ struct Icon: Codable {
     }
 }
 
-struct RasterSize: Codable {
+struct RasterSizeDTO: Codable {
     let sizeWidth: Int?
     let sizeHeight: Int?
-    let formats: [Format]?
+    let formats: [FormatDTO]?
 
     enum CodingKeys: String, CodingKey {
         case sizeWidth = "size_width"
@@ -31,7 +29,7 @@ struct RasterSize: Codable {
     }
 }
 
-struct Format: Codable {
+struct FormatDTO: Codable {
     let format: String?
     let downloadURL: String?
     let previewURL: String?
@@ -42,50 +40,3 @@ struct Format: Codable {
         case previewURL = "preview_url"
     }
 }
-
-
-/// Пример ответа в формате JSON
-/*
-{
-  "total_count": 242,
-  "icons": [
-    {
-      "icon_id": 380453,
-      "name": "Nirion: Merry Christmas 3D",
-      "is_premium": true,
-      "raster_sizes": [
-        {
-          "size_width": 512,
-          "size_height": 512,
-          "formats": [
-            {
-              "format": "png",
-              "download_url": "https://cdn.iconfinder.com/data/icons/nirion-merry-christmas-3d/512/icon.png"
-            }
-          ]
-        }
-      ],
-      "tags": ["christmas", "holiday", "3d"]
-    },
-    {
-      "icon_id": 380454,
-      "name": "Nirion: New Year 3D",
-      "is_premium": false,
-      "raster_sizes": [
-        {
-          "size_width": 256,
-          "size_height": 256,
-          "formats": [
-            {
-              "format": "png",
-              "download_url": "https://cdn.iconfinder.com/data/icons/nirion-new-year-3d/256/icon.png"
-            }
-          ]
-        }
-      ],
-      "tags": ["new year", "holiday", "3d"]
-    }
-  ]
-}
-
-*/

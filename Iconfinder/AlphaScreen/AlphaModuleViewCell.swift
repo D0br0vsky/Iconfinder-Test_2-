@@ -1,33 +1,27 @@
 
 import UIKit
 
-protocol CellViewProtocol: AnyObject {
-    func showError(_ message: String)
-    func showSuccess(_ message: String)
+protocol AlphaModuleViewCellProtocol: AnyObject {
+
 }
 
-final class CellView: UICollectionViewCell {
+final class AlphaModuleViewCell: UICollectionViewCell {
+    static let id = "AlphaModuleViewCell"
     
-    private var onDownloadButtonTap: (() -> Void)?
-    
-    static let id = "CellView"
-    
-    // Модель через которую передают все изменения во View из Presenter
     struct Model {
         let iconID: Int
-        let maxSize: String // Текст для отображения
-        let tags: String // Текст для отображения
-        let buttonText: String // Текст на кнопке
-        let imageURL: String // URL изображения
+        let maxSize: String
+        let tags: String
+        let buttonText: String
+        let imageURL: String
     }
-    
     
     private lazy var imageCard: UIImageView = {
         let image = UIImageView()
         image.contentMode = .scaleAspectFit
-        image.image = UIImage(named: "test") // тестовое изображение
+        image.image = UIImage(named: "test")
         image.layer.cornerRadius = 14
-        image.clipsToBounds = true // Обязательно для работы закругления
+        image.clipsToBounds = true
         return image
     }()
     
@@ -94,63 +88,27 @@ final class CellView: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - Конфигурация
-    
-    public func configure(with model: Model, downloadAction: @escaping () -> Void) {
-        sizeLabel.text = model.maxSize
-        tagsLabel.text = model.tags
-        onDownloadButtonTap = downloadAction
-
-        if let url = URL(string: model.imageURL) {
-            downloadImage(from: url)
-        } else {
-            imageCard.image = UIImage(named: "placeholder")
-        }
-    }
-    
-    /// Наверно нужно перетащить это в Presenter
-    private func downloadImage(from url: URL) {
-            // Вы можете использовать стороннюю библиотеку для кэширования изображений, например, SDWebImage
-            // Здесь для простоты используем URLSession
-            URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
-                guard let self = self else { return }
-                if let data = data, let image = UIImage(data: data) {
-                    DispatchQueue.main.async {
-                        self.imageCard.image = image
-                    }
-                } else {
-                    // Обработка ошибки
-                    DispatchQueue.main.async {
-                        self.imageCard.image = UIImage(named: "placeholder")
-                    }
-                }
-            }.resume()
-        }
-    
-    // Метод для обновления View на основе модели
     func update(model: Model) {
         sizeLabel.text = model.maxSize
         tagsLabel.text = model.tags
-        downloadButton.setTitle(model.buttonText, for: .normal) // Обновляем текст кнопки
+        downloadButton.setTitle(model.buttonText, for: .normal)
     }
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        onDownloadButtonTap = nil
         sizeLabel.text = nil
         tagsLabel.text = nil
         imageCard.image = nil
     }
 }
 
-private extension CellView {
+private extension AlphaModuleViewCell {
     func commonInit() {
         setupSubviews()
         setupConstraints()
     }
     
     func setupSubviews() {
-        //stackView.addArrangedSubview(baseShape) /// чет мутное обратить внимание при ошибках <-------
         downloadButton.addTarget(self, action: #selector(downloadButtonTapped), for: .touchUpInside)
         contentView.addSubview(baseShape)
         baseShape.addSubview(imageCard)
@@ -164,7 +122,6 @@ private extension CellView {
     }
     
     func setupConstraints() {
-        
         baseShape.translatesAutoresizingMaskIntoConstraints = false
         imageCard.translatesAutoresizingMaskIntoConstraints = false
         sizeShape.translatesAutoresizingMaskIntoConstraints = false
@@ -176,7 +133,6 @@ private extension CellView {
         tagsLabel.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            
             baseShape.topAnchor.constraint(equalTo: topAnchor, constant: 5),
             baseShape.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -5),
             baseShape.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 5),
@@ -222,25 +178,8 @@ private extension CellView {
             downloadButton.heightAnchor.constraint(equalToConstant: 40),
         ])
     }
-    @objc func downloadButtonTapped() {
-        onDownloadButtonTap?()
-    }
-}
-
-extension CellView: CellViewProtocol {
-    func showError(_ message: String) {
-        print("Error: \(message)")
-    }
     
-    func showSuccess(_ message: String) {
-        print("Success: \(message)")
-    }
-}
-
-extension CellView {
-    func reset() {
-        sizeLabel.text = nil
-        tagsLabel.text = nil
-        onDownloadButtonTap = nil
+    @objc func downloadButtonTapped() {
+        
     }
 }
