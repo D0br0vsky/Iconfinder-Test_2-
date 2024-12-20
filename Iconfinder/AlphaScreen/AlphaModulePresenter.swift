@@ -61,7 +61,7 @@ extension AlphaModulePresenter {
         let previewURL = "https://cdn2.iconfinder.com/data/icons/flat-icons-19/512/Hunting_bow.png"
         let downloadURL = "22"
         
-        let value = IconsInformationModel(maxSize: maxSize, tags: tagser, previewURL: previewURL, downloadURL: downloadURL)
+        let value = IconsInformationModel(iconID: 0, maxSize: maxSize, tags: tagser, previewURL: previewURL, downloadURL: downloadURL)
         iconsInformation.append(value)
     }
 }
