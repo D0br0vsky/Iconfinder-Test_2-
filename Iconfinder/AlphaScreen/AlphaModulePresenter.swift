@@ -6,7 +6,7 @@ protocol AlphaPresenterProtocol {
 }
 
 final class AlphaModulePresenter: AlphaPresenterProtocol {
-    private var dataLoader = DataLoader()
+    private var dataLoader: DataLoader
     private let dataService: DataServiceProtocol
     
     weak var view: AlphaControllerProtocol?
@@ -18,6 +18,10 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
     }
     
     func viewDidLoad() {
+        iconsInformationLoader()
+    }
+    
+    func iconsInformationLoader() {
         dataService.fetchIcons(query: "star", count: 10) { result in
             switch result {
             case .success(let icons):
@@ -27,9 +31,4 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
             }
         }
     }
-    
-    func someDataLoad() {
-        
-    }
-    
 }

@@ -9,11 +9,11 @@ final class AlphaModuleViewCell: UICollectionViewCell {
     static let id = "AlphaModuleViewCell"
     
     struct Model {
-        let iconID: Int
+        let previewURL: String
         let maxSize: String
         let tags: String
-        let buttonText: String
-        let imageURL: String
+        let downloadURL: String
+
     }
     
     private lazy var imageCard: UIImageView = {
@@ -89,9 +89,9 @@ final class AlphaModuleViewCell: UICollectionViewCell {
     }
     
     func update(model: Model) {
+        imageCard.image = UIImage(named: model.previewURL)
         sizeLabel.text = model.maxSize
         tagsLabel.text = model.tags
-        downloadButton.setTitle(model.buttonText, for: .normal)
     }
     
     override func prepareForReuse() {
@@ -126,11 +126,11 @@ private extension AlphaModuleViewCell {
         imageCard.translatesAutoresizingMaskIntoConstraints = false
         sizeShape.translatesAutoresizingMaskIntoConstraints = false
         tagsShape.translatesAutoresizingMaskIntoConstraints = false
-        downloadButton.translatesAutoresizingMaskIntoConstraints = false
         sizeImage.translatesAutoresizingMaskIntoConstraints = false
         sizeLabel.translatesAutoresizingMaskIntoConstraints = false
         tagsImage.translatesAutoresizingMaskIntoConstraints = false
         tagsLabel.translatesAutoresizingMaskIntoConstraints = false
+        downloadButton.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             baseShape.topAnchor.constraint(equalTo: topAnchor, constant: 5),
