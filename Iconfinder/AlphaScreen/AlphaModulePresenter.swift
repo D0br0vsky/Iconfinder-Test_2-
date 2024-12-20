@@ -54,6 +54,14 @@ extension AlphaModulePresenter {
     }
     
     func convertAndAddsDataIcon(_ dataIcons: [IconDTO]) {
+    
+        // тестовая заглушка для корректрировки интерфейса
+        let maxSize = "512 x 512"
+        let tagser = ["bow", "bow weapon", "bow shooting"]
+        let previewURL = "https://cdn2.iconfinder.com/data/icons/flat-icons-19/512/Hunting_bow.png"
+        let downloadURL = "22"
         
+        let value = IconsInformationModel(maxSize: maxSize, tags: tagser, previewURL: previewURL, downloadURL: downloadURL)
+        iconsInformation.append(value)
     }
 }

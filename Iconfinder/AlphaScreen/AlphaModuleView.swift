@@ -39,11 +39,12 @@ final class AlphaModuleView: UIView, UISearchBarDelegate, UICollectionViewDelega
         layout.scrollDirection = .vertical
         layout.minimumLineSpacing = 10
         layout.minimumInteritemSpacing = 10
+        layout.itemSize = CGSize(width: 380, height: 20)
         layout.sectionInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .white
-//      collectionView.dataSource = self
+        collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.alwaysBounceVertical = true
         collectionView.register(AlphaModuleViewCell.self, forCellWithReuseIdentifier: AlphaModuleViewCell.id)
@@ -88,6 +89,23 @@ final class AlphaModuleView: UIView, UISearchBarDelegate, UICollectionViewDelega
     }
 }
 
+// MARK: - UICollectionViewDataSource
+extension AlphaModuleView: UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        model?.items.count ?? 0
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: AlphaModuleViewCell.id, for: indexPath) as? AlphaModuleViewCell else {
+            return UICollectionViewCell()
+        }
+        let item = data[indexPath.item]
+        cell.update(model: item)
+        return cell
+    }
+}
+
+// MARK: - ConstraintsSubviews
 private extension AlphaModuleView {
     func commonInit() {
         backgroundColor = .white
@@ -137,3 +155,4 @@ private extension AlphaModuleView {
         
     }
 }
+

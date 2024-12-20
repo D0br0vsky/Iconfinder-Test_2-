@@ -101,6 +101,7 @@ final class AlphaModuleViewCell: UICollectionViewCell {
     }
 }
 
+// MARK: - ConstraintsSubviews
 private extension AlphaModuleViewCell {
     func commonInit() {
         setupSubviews()
