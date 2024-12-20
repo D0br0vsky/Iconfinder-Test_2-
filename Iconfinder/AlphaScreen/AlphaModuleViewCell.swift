@@ -19,7 +19,6 @@ final class AlphaModuleViewCell: UICollectionViewCell {
     private lazy var imageCard: UIImageView = {
         let image = UIImageView()
         image.contentMode = .scaleAspectFit
-        image.image = UIImage(named: "test")
         image.layer.cornerRadius = 14
         image.clipsToBounds = true
         return image
@@ -89,7 +88,7 @@ final class AlphaModuleViewCell: UICollectionViewCell {
     }
     
     func update(model: Model) {
-        imageCard.image = UIImage(named: model.previewURL)
+        imageCard.loadImageURL(from: model.previewURL, palceHolder: UIImage(named: "test"))
         sizeLabel.text = model.maxSize
         tagsLabel.text = model.tags
     }
