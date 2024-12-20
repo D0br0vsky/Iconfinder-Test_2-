@@ -132,8 +132,7 @@ private extension AlphaModuleView {
             collectionView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
     }
-    
-    
+
     @objc private func searchButtonTapped() {
         
     }
