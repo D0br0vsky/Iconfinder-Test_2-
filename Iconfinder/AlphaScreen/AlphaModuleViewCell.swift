@@ -1,10 +1,6 @@
 
 import UIKit
 
-protocol AlphaModuleViewCellProtocol: AnyObject {
-
-}
-
 final class AlphaModuleViewCell: UICollectionViewCell {
     static let id = "AlphaModuleViewCell"
     
@@ -70,6 +66,7 @@ final class AlphaModuleViewCell: UICollectionViewCell {
         button.backgroundColor = .systemGreen
         button.layer.cornerRadius = 8
         button.imageView?.contentMode = .scaleAspectFit
+        button.addTarget(self, action: #selector(downloadButtonTapped), for: .touchUpInside)
         return button
     }()
     
@@ -88,7 +85,7 @@ final class AlphaModuleViewCell: UICollectionViewCell {
     }
     
     func update(model: Model) {
-        imageCard.loadImageURL(from: model.previewURL, palceHolder: UIImage(named: "test"))
+        imageCard.loadImageURL(from: model.previewURL, palceHolder: UIImage(named: "loading"))
         sizeLabel.text = model.maxSize
         tagsLabel.text = model.tags
     }
@@ -109,7 +106,6 @@ private extension AlphaModuleViewCell {
     }
     
     func setupSubviews() {
-        downloadButton.addTarget(self, action: #selector(downloadButtonTapped), for: .touchUpInside)
         contentView.addSubview(baseShape)
         baseShape.addSubview(imageCard)
         baseShape.addSubview(sizeShape)
@@ -180,6 +176,6 @@ private extension AlphaModuleViewCell {
     }
     
     @objc func downloadButtonTapped() {
-        
+        presenter
     }
 }

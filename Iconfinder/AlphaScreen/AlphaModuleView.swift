@@ -1,7 +1,7 @@
 
 import UIKit
 
-final class AlphaModuleView: UIView, UISearchBarDelegate, UICollectionViewDelegate {
+final class AlphaModuleView: UIView, UICollectionViewDelegate {
     typealias item = AlphaModuleViewCell.Model
     struct Model {
         let items: [item]
@@ -87,6 +87,20 @@ final class AlphaModuleView: UIView, UISearchBarDelegate, UICollectionViewDelega
     func stopLoader() {
         
     }
+    
+    
+}
+
+// MARK: - UISearchBarDelegate
+extension AlphaModuleView: UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        presenter.updateQuery(searchText)
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+        presenter.updateQuery(searchBar.text ?? "")
+    }
 }
 
 // MARK: - UICollectionViewDataSource
@@ -152,7 +166,10 @@ private extension AlphaModuleView {
     }
 
     @objc private func searchButtonTapped() {
-        
+        guard let query = searchBar.text, !query.isEmpty else { return }
+            presenter.updateQuery(query)
+            presenter.searchQueryUpdated()
+            searchBar.resignFirstResponder()
     }
 }
 

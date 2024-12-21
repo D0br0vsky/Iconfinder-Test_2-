@@ -2,13 +2,15 @@
 import Foundation
 
 protocol AlphaPresenterProtocol {
-    
+    func searchQueryUpdated()
+    func updateQuery(_ query: String)
 }
 
 final class AlphaModulePresenter: AlphaPresenterProtocol {
     private var dataLoader: DataLoader
     private let dataService: DataServiceProtocol
     private var iconsInformation: [IconsInformationModel] = []
+    private var currentQuery: String = "emoji"
     
     weak var view: AlphaControllerProtocol?
     
@@ -17,14 +19,22 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
         self.dataService = dataService
     }
     
+    func searchQueryUpdated() {
+        iconsInformation.removeAll()
+        iconsInformationLoader()
+    }
+    
+    func updateQuery(_ query: String) {
+        currentQuery = query
+    }
+    
     func viewDidLoad() {
         iconsInformationLoader()
     }
     
     func iconsInformationLoader() {
         view?.startLoader()
-        
-        dataService.fetchIcons(query: "emoji", count: 40) { [weak self] result in
+        dataService.fetchIcons(query: currentQuery, count: 22) { [weak self] result in
             guard let self = self else { return }
             self.view?.stopLoader()
             switch result {

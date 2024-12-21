@@ -2,6 +2,7 @@
 import UIKit
 
 protocol AlphaControllerProtocol: AnyObject {
+    
     func update(model: AlphaModuleView.Model)
     func showError()
     func showEmpty()
@@ -9,8 +10,9 @@ protocol AlphaControllerProtocol: AnyObject {
     func stopLoader()
 }
 
-final class AlphaModuleController: UIViewController {
+final class AlphaModuleController: UIViewController, UISearchBarDelegate {
     private let presenter: AlphaModulePresenter
+    private let searchBar = UISearchBar()
     private lazy var customView = AlphaModuleView(presenter: presenter)
     
     init(presenter: AlphaModulePresenter) {
@@ -24,15 +26,29 @@ final class AlphaModuleController: UIViewController {
     }
     
     override func loadView() {
+        super.viewDidLoad()
         view = customView
     }
     
     override func viewDidLoad() {
         presenter.viewDidLoad()
     }
+    
+    private func setupSearchBar() {
+        searchBar.delegate = self
+        navigationItem.titleView = searchBar
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+            guard let query = searchBar.text, !query.isEmpty else { return }
+            presenter.updateQuery(query)
+            searchBar.resignFirstResponder()
+        }
 }
 
+// MARK: - AlphaControllerProtocol
 extension AlphaModuleController: AlphaControllerProtocol {
+
     func update(model: AlphaModuleView.Model) {
         customView.update(model: model)
     }

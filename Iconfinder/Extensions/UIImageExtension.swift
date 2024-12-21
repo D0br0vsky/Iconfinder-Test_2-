@@ -9,7 +9,7 @@ extension UIImageView {
             return
         }
         URLSession.shared.dataTask(with: url) { data, responce, error in
-            if let error = error {
+            if error != nil {
                 return
             }
             guard let data = data, let image = UIImage(data: data) else {
