@@ -24,7 +24,7 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
     func iconsInformationLoader() {
         view?.startLoader()
         
-        dataService.fetchIcons(query: "star", count: 10) { [weak self] result in
+        dataService.fetchIcons(query: "emoji", count: 40) { [weak self] result in
             guard let self = self else { return }
             self.view?.stopLoader()
             switch result {
@@ -54,14 +54,38 @@ extension AlphaModulePresenter {
     }
     
     func convertAndAddsDataIcon(_ dataIcons: [IconDTO]) {
-    
-        // тестовая заглушка для корректрировки интерфейса
-        let maxSize = "512 x 512"
-        let tagser = ["bow", "bow weapon", "bow shooting"]
-        let previewURL = "https://cdn2.iconfinder.com/data/icons/flat-icons-19/512/Hunting_bow.png"
-        let downloadURL = "22"
+        var iconArray: [Int: [IconDTO]] = [:]
+        for iconId in dataIcons {
+            iconArray[iconId.iconID, default: []].append(iconId)
+        }
         
-        let value = IconsInformationModel(iconID: 0, maxSize: maxSize, tags: tagser, previewURL: previewURL, downloadURL: downloadURL)
-        iconsInformation.append(value)
+        for (iconId, iconInfo) in iconArray {
+            
+            let sizeMaxWidth = iconInfo
+                .compactMap { $0.rasterSizes?.compactMap { $0.sizeWidth }.max() }
+                .max() ?? 0
+            
+            let sizeMaxHeight = iconInfo
+                .compactMap { $0.rasterSizes?.compactMap { $0.sizeHeight }.max() }
+                .max() ?? 0
+  
+            let tags = iconInfo.first?.tags ?? []
+
+            let previewURL = iconInfo
+                .compactMap { icon in icon.rasterSizes?
+                        .filter { $0.sizeHeight == sizeMaxHeight && $0.sizeWidth == sizeMaxWidth }
+                        .flatMap { $0.formats.compactMap { $0.previewURL } }.first }
+                        .first ?? ""
+            
+    
+            let downloadURL = iconInfo
+                .compactMap { icon in icon.rasterSizes?
+                        .filter { $0.sizeHeight == sizeMaxHeight && $0.sizeWidth == sizeMaxWidth }
+                        .flatMap { $0.formats.map { $0.downloadURL } }
+                        .first }.first ?? ""
+            
+            let value = IconsInformationModel(iconID: iconId, maxSize: "\(sizeMaxWidth)px x \(sizeMaxHeight)px", tags: tags, previewURL: previewURL, downloadURL: downloadURL)
+            iconsInformation.append(value)
+        }
     }
 }
