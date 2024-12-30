@@ -12,6 +12,8 @@ final class AlphaModuleViewCell: UICollectionViewCell {
 
     }
     
+    private var model: Model?
+    
     private lazy var imageCard: UIImageView = {
         let image = UIImageView()
         image.contentMode = .scaleAspectFit
@@ -85,6 +87,7 @@ final class AlphaModuleViewCell: UICollectionViewCell {
     }
     
     func update(model: Model) {
+        self.model = model
         imageCard.loadImageURL(from: model.previewURL, palceHolder: UIImage(named: "loading"))
         sizeLabel.text = model.maxSize
         tagsLabel.text = model.tags
@@ -98,7 +101,7 @@ final class AlphaModuleViewCell: UICollectionViewCell {
     }
 }
 
-// MARK: - ConstraintsSubviews
+// MARK: - Setup Subviews and Constraints
 private extension AlphaModuleViewCell {
     func commonInit() {
         setupSubviews()
@@ -176,6 +179,16 @@ private extension AlphaModuleViewCell {
     }
     
     @objc func downloadButtonTapped() {
-        presenter
+        guard let model = model else {
+            return
+        }
+        guard !model.downloadURL.isEmpty else {
+            return
+        }
+        downloadButton.setImage(UIImage(named: "ok"), for: .normal)
+        presenter?.didTapDownloadButton(with: model.downloadURL)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
+            self?.downloadButton.setImage(UIImage(named: "download"), for: .normal)
+        }
     }
 }

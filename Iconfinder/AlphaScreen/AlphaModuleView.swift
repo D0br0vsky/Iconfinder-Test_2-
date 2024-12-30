@@ -119,7 +119,7 @@ extension AlphaModuleView: UICollectionViewDataSource {
     }
 }
 
-// MARK: - ConstraintsSubviews
+// MARK: - Setup Subviews and Constraints
 private extension AlphaModuleView {
     func commonInit() {
         backgroundColor = .white
@@ -168,7 +168,7 @@ private extension AlphaModuleView {
     @objc private func searchButtonTapped() {
         guard let query = searchBar.text, !query.isEmpty else { return }
             presenter.updateQuery(query)
-            presenter.searchQueryUpdated()
+            presenter.searchQueryUpdate()
             searchBar.resignFirstResponder()
     }
 }

@@ -47,7 +47,7 @@ final class AlphaModuleController: UIViewController, UISearchBarDelegate {
 }
 
 // MARK: - AlphaControllerProtocol
-extension AlphaModuleController: AlphaControllerProtocol {
+extension AlphaModuleController: AlphaControllerProtocol { 
 
     func update(model: AlphaModuleView.Model) {
         customView.update(model: model)

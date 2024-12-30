@@ -1,31 +1,45 @@
 
-import Foundation
+import UIKit
 
 protocol AlphaPresenterProtocol {
-    func searchQueryUpdated()
+    func searchQueryUpdate()
     func updateQuery(_ query: String)
+    
+    func didTapDownloadButton(with url: String)
 }
 
 final class AlphaModulePresenter: AlphaPresenterProtocol {
-    private var dataLoader: DataLoader
-    private let dataService: DataServiceProtocol
-    private var iconsInformation: [IconsInformationModel] = []
-    private var currentQuery: String = "emoji"
-    
     weak var view: AlphaControllerProtocol?
+    
+    private let dataLoader: DataLoader
+    private let dataService: DataServiceProtocol
+    
+    private var currentQuery: String = "emoji"
+    private var urlDownload = ""
+    private var iconsInformation: [IconsInformationModel] = []
     
     init(dataLoader: DataLoader, dataService: DataService) {
         self.dataLoader = dataLoader
         self.dataService = dataService
     }
     
-    func searchQueryUpdated() {
+    func searchQueryUpdate() {
         iconsInformation.removeAll()
         iconsInformationLoader()
     }
     
     func updateQuery(_ query: String) {
         currentQuery = query
+    }
+    
+    func didTapDownloadButton(with url: String) {
+        guard !url.isEmpty else {
+            print("Download URL is empty")
+            return
+        }
+        let imageView = UIImageView()
+        imageView.checkForDownload(from: url, shouldSaveToPhotos: true)
+        print("Attempting to download image from URL: \(url)")
     }
     
     func viewDidLoad() {
@@ -50,7 +64,7 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
 }
 
 // MARK: - Extension private
-extension AlphaModulePresenter {
+private extension AlphaModulePresenter {
     func updateUI() {
         guard !iconsInformation.isEmpty else {
             view?.showEmpty()
@@ -94,8 +108,9 @@ extension AlphaModulePresenter {
                         .flatMap { $0.formats.map { $0.downloadURL } }
                         .first }.first ?? ""
             
-            let value = IconsInformationModel(iconID: iconId, maxSize: "\(sizeMaxWidth)px x \(sizeMaxHeight)px", tags: tags, previewURL: previewURL, downloadURL: downloadURL)
-            iconsInformation.append(value)
+            let iconsInformationModel = IconsInformationModel(iconID: iconId, maxSize: "\(sizeMaxWidth)px x \(sizeMaxHeight)px", tags: tags, previewURL: previewURL, downloadURL: downloadURL)
+            iconsInformation.append(iconsInformationModel)
+            urlDownload = downloadURL
         }
     }
 }
