@@ -9,5 +9,5 @@ struct IconsInformationModel {
 
 struct EmptyStatusModel {
     static let emptySearchTerm = "🟢 Enter your search term."
-    static let nothingFound = "🔴 Nothing found, try again."
+    static let nothingFound = "🟠 Nothing found, try again."
 }

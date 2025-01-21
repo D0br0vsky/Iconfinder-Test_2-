@@ -34,18 +34,8 @@ final class AlphaModuleController: UIViewController, UISearchBarDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        if let screenStateViewModels = screenStateViewModels as? UIView {
-                view.addSubview(screenStateViewModels)
-                screenStateViewModels.translatesAutoresizingMaskIntoConstraints = false
-                NSLayoutConstraint.activate([
-                    screenStateViewModels.topAnchor.constraint(equalTo: view.topAnchor, constant: 200),
-                    screenStateViewModels.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                    screenStateViewModels.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-                    screenStateViewModels.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-                ])
-            }
-
-            presenter.viewDidLoad()
+        commonInit()
+        presenter.viewDidLoad()
     }
     
     private func setupSearchBar() {
@@ -84,5 +74,28 @@ extension AlphaModuleController: AlphaControllerProtocol {
     
     func hideAllStates() {
         screenStateViewModels.hideAllStates()
+    }
+}
+
+// MARK: - Setup Subviews and Constraints
+private extension AlphaModuleController {
+    func commonInit() {
+        setupSubviews()
+        setupConstraints()
+    }
+    
+    func setupSubviews() {
+        view.addSubview(screenStateViewModels)
+    }
+    
+    func setupConstraints() {
+        screenStateViewModels.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            screenStateViewModels.topAnchor.constraint(equalTo: view.topAnchor),
+            screenStateViewModels.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            screenStateViewModels.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            screenStateViewModels.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
     }
 }

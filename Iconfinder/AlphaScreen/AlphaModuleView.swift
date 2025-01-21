@@ -6,6 +6,8 @@ final class AlphaModuleView: UIView, UICollectionViewDelegate {
     struct Model {
         let items: [item]
     }
+    
+    private let debouncer = CancellableExecutor(queue: .main)
     private var data: [AlphaModuleViewCell.Model] = []
     private var model: Model?
     
@@ -80,7 +82,11 @@ final class AlphaModuleView: UIView, UICollectionViewDelegate {
 // MARK: - UISearchBarDelegate
 extension AlphaModuleView: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        presenter.updateQuery(searchText)
+        debouncer.execute(delay: .milliseconds(300)) { [weak self] isCancelled in
+            guard !isCancelled.isCancelled else { return }
+            self?.presenter.updateQuery(searchText)
+            self?.presenter.searchQueryUpdate()
+        }
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {

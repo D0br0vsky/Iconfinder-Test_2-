@@ -2,7 +2,7 @@
 import UIKit
 
 final class LoadingViewState: UIView {
-    private let activityIndicator = UIActivityIndicatorView()
+    private let activityIndicator = UIActivityIndicatorView(style: .large)
     
     private lazy var messageLabel: UILabel = {
         let label = UILabel()
@@ -27,6 +27,7 @@ final class LoadingViewState: UIView {
 // MARK: - Setup Subviews and Constraints
 private extension LoadingViewState {
     func commonInit() {
+        backgroundColor = .white
         setupSubviews()
         setupConstraints()
     }

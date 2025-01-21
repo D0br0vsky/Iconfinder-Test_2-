@@ -11,8 +11,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window = UIWindow(frame: UIScreen.main.bounds)
         
         let alphaModule = AlphaModuleFactory().make()
-        
         let nav = CustomNavigationController(rootViewController: alphaModule)
+        
         window?.rootViewController = nav
         window?.makeKeyAndVisible()
         return true

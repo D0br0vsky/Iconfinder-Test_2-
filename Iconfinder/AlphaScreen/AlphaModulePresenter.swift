@@ -60,7 +60,7 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
         
         guard !isLoading else { return }
         isLoading = true
-        page = 1
+        view?.hideAllStates()
         view?.startLoading()
         guard !searchQuery.isEmpty else {
             loadedIconsForView.removeAll()

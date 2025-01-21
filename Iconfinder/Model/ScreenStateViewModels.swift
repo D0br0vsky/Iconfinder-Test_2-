@@ -1,7 +1,7 @@
 
 import UIKit
 
-protocol ScreenStateViewModelsProtocol: AnyObject {
+protocol ScreenStateViewModelsProtocol: UIView {
     func showError()
     func showEmpty(text: String)
     func startLoading()
@@ -112,12 +112,12 @@ private extension ScreenStateViewModels {
             errorView.trailingAnchor.constraint(equalTo: trailingAnchor),
             errorView.bottomAnchor.constraint(equalTo: bottomAnchor),
             
-            loadingView.topAnchor.constraint(equalTo: topAnchor),
+            loadingView.topAnchor.constraint(equalTo: topAnchor, constant: 150),
             loadingView.leadingAnchor.constraint(equalTo: leadingAnchor),
             loadingView.trailingAnchor.constraint(equalTo: trailingAnchor),
             loadingView.bottomAnchor.constraint(equalTo: bottomAnchor),
             
-            emptyView.topAnchor.constraint(equalTo: topAnchor, constant: 200),
+            emptyView.topAnchor.constraint(equalTo: topAnchor),
             emptyView.leadingAnchor.constraint(equalTo: leadingAnchor),
             emptyView.trailingAnchor.constraint(equalTo: trailingAnchor),
             emptyView.bottomAnchor.constraint(equalTo: bottomAnchor)
