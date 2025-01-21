@@ -8,9 +8,13 @@ final class AlphaModuleFactory {
     
     func make() -> UIViewController {
         let dataLoader = DataLoader()
-        let dataService = DataService(dataLoader: dataLoader)
-        let presenter = AlphaModulePresenter(dataLoader: dataLoader, dataService: dataService)
-        let vc = AlphaModuleController(presenter: presenter)
+        let cacheManager = CacheManager()
+        let permissionManager = PermissionManager()
+        let screenStateViewModels = ScreenStateViewModels()
+        let downloadImageUseCase = DownloadImageUseCase(permissionManager: permissionManager, dataLoader: dataLoader)
+        let dataService = DataService(dataLoader: dataLoader, cacheManager: cacheManager)
+        let presenter = AlphaModulePresenter(dataLoader: dataLoader, dataService: dataService, downloadImageUseCase: downloadImageUseCase)
+        let vc = AlphaModuleController(presenter: presenter, screenStateViewModels: screenStateViewModels)
         presenter.view = vc
         return vc
     }

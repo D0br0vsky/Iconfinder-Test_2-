@@ -1,7 +1,11 @@
 
 import Foundation
 
-final class DataLoader {
+protocol DataLoaderProtocol {
+    func fetchData<U: Decodable>(url: URLRequest, completion: @escaping (Result<U, Error>) -> Void)
+}
+
+final class DataLoader: DataLoaderProtocol {
     func fetchData<U: Decodable>(url: URLRequest, completion: @escaping (Result<U, Error>) -> Void) {
         let task = URLSession.shared.dataTask(with: url) { data, responce, error in
             if let error = error {

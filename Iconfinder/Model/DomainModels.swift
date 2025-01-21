@@ -6,3 +6,8 @@ struct IconsInformationModel {
     let previewURL: String
     let downloadURL: String
 }
+
+struct EmptyStatusModel {
+    static let emptySearchTerm = "🟢 Enter your search term."
+    static let nothingFound = "🔴 Nothing found, try again."
+}

@@ -4,6 +4,7 @@ import UIKit
 final class AlphaModuleViewCell: UICollectionViewCell {
     static let id = "AlphaModuleViewCell"
     
+    private var model: Model?
     struct Model {
         let previewURL: String
         let maxSize: String
@@ -12,7 +13,11 @@ final class AlphaModuleViewCell: UICollectionViewCell {
 
     }
     
-    private var model: Model?
+    
+    private lazy var screenStateViewModels: ScreenStateViewModels = {
+        let view = ScreenStateViewModels()
+        return view
+    }()
     
     private lazy var imageCard: UIImageView = {
         let image = UIImageView()
@@ -88,7 +93,10 @@ final class AlphaModuleViewCell: UICollectionViewCell {
     
     func update(model: Model) {
         self.model = model
-        imageCard.loadImageURL(from: model.previewURL, palceHolder: UIImage(named: "loading"))
+        screenStateViewModels.startLoading()
+        imageCard.loadImageURL(from: model.previewURL) { [weak self] in
+            self?.screenStateViewModels.hideAllStates()
+        }
         sizeLabel.text = model.maxSize
         tagsLabel.text = model.tags
     }
@@ -109,6 +117,7 @@ private extension AlphaModuleViewCell {
     }
     
     func setupSubviews() {
+        contentView.addSubview(screenStateViewModels)
         contentView.addSubview(baseShape)
         baseShape.addSubview(imageCard)
         baseShape.addSubview(sizeShape)
@@ -121,6 +130,7 @@ private extension AlphaModuleViewCell {
     }
     
     func setupConstraints() {
+        screenStateViewModels.translatesAutoresizingMaskIntoConstraints = false
         baseShape.translatesAutoresizingMaskIntoConstraints = false
         imageCard.translatesAutoresizingMaskIntoConstraints = false
         sizeShape.translatesAutoresizingMaskIntoConstraints = false
@@ -175,13 +185,16 @@ private extension AlphaModuleViewCell {
             downloadButton.trailingAnchor.constraint(equalTo: baseShape.trailingAnchor, constant: -10),
             downloadButton.leadingAnchor.constraint(equalTo: baseShape.leadingAnchor, constant: 10),
             downloadButton.heightAnchor.constraint(equalToConstant: 40),
+            
+            screenStateViewModels.topAnchor.constraint(equalTo: contentView.topAnchor),
+            screenStateViewModels.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            screenStateViewModels.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            screenStateViewModels.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
         ])
     }
     
     @objc func downloadButtonTapped() {
-        guard let model = model else {
-            return
-        }
+        guard let model = model else { return }
         guard !model.downloadURL.isEmpty else {
             return
         }

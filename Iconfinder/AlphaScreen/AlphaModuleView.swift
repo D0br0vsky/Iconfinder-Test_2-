@@ -11,16 +11,20 @@ final class AlphaModuleView: UIView, UICollectionViewDelegate {
     
     private lazy var topShape: UIView = {
         let shape = UIView()
-        shape.backgroundColor = .black
-        shape.layer.cornerRadius = 14
+        shape.backgroundColor = .gray
+        shape.layer.cornerRadius = 6
         return shape
     }()
     
     private lazy var searchBar: UISearchBar = {
         let searchBar = UISearchBar()
         searchBar.placeholder = "Start your search ..."
+        searchBar.tintColor = .gray
         searchBar.sizeToFit()
+        searchBar.searchTextField.textColor = .white
         searchBar.delegate = self
+        searchBar.layer.shadowOpacity = 0
+        searchBar.backgroundImage = UIImage()
         return searchBar
     }()
     
@@ -28,7 +32,7 @@ final class AlphaModuleView: UIView, UICollectionViewDelegate {
         let button = UIButton()
         button.setImage(UIImage(named: "find"), for: .normal)
         button.backgroundColor = .white
-        button.layer.cornerRadius = 14
+        button.layer.cornerRadius = 6
         button.imageView?.contentMode = .scaleAspectFit
         button.addTarget(self, action: #selector(searchButtonTapped), for: .touchUpInside)
         return button
@@ -65,30 +69,12 @@ final class AlphaModuleView: UIView, UICollectionViewDelegate {
     }
     
     func update(model: Model) {
-        self.model = model
-        self.data = model.items
         DispatchQueue.main.async { [weak self] in
+            self?.model = model // check it
+            self?.data = model.items
             self?.collectionView.reloadData()
         }
     }
-    
-    func showError() {
-        
-    }
-    
-    func showEmpty() {
-        
-    }
-    
-    func startLoader() {
-        
-    }
-    
-    func stopLoader() {
-        
-    }
-    
-    
 }
 
 // MARK: - UISearchBarDelegate
@@ -103,6 +89,19 @@ extension AlphaModuleView: UISearchBarDelegate {
     }
 }
 
+// MARK: - UIScrollViewDelegate
+extension AlphaModuleView: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let offsetY = scrollView.contentOffset.y
+        let contentHeight = scrollView.contentSize.height
+        let height = scrollView.frame.size.height
+       
+        if offsetY > contentHeight - height * 2 {
+            presenter.loadIconsData()
+        }
+    }
+}
+
 // MARK: - UICollectionViewDataSource
 extension AlphaModuleView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -113,8 +112,10 @@ extension AlphaModuleView: UICollectionViewDataSource {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: AlphaModuleViewCell.id, for: indexPath) as? AlphaModuleViewCell else {
             return UICollectionViewCell()
         }
+        
         let item = data[indexPath.item]
         cell.update(model: item)
+        cell.presenter = presenter
         return cell
     }
 }
@@ -128,7 +129,6 @@ private extension AlphaModuleView {
     }
     
     func setupSubviews() {
-        
         addSubview(topShape)
         addSubview(collectionView)
         topShape.addSubview(searchBar)
@@ -142,7 +142,6 @@ private extension AlphaModuleView {
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            
             topShape.topAnchor.constraint(equalTo: topAnchor, constant: 100),
             topShape.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
             topShape.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
@@ -158,18 +157,22 @@ private extension AlphaModuleView {
             searchButton.widthAnchor.constraint(equalToConstant: 50),
             searchButton.heightAnchor.constraint(equalToConstant: 40),
             
-            collectionView.topAnchor.constraint(equalTo: topShape.bottomAnchor, constant: 10),
+            collectionView.topAnchor.constraint(equalTo: topShape.bottomAnchor, constant: 5),
             collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: bottomAnchor)
+            collectionView.bottomAnchor.constraint(equalTo: bottomAnchor),
         ])
     }
-
+    
     @objc private func searchButtonTapped() {
-        guard let query = searchBar.text, !query.isEmpty else { return }
-            presenter.updateQuery(query)
+        guard let query = searchBar.text, !query.isEmpty else {
+            presenter.updateQuery("")
             presenter.searchQueryUpdate()
-            searchBar.resignFirstResponder()
+            return
+        }
+        presenter.updateQuery(query)
+        presenter.searchQueryUpdate()
+        searchBar.resignFirstResponder()
     }
 }
 

@@ -3,43 +3,23 @@ import UIKit
 import Photos
 
 extension UIImageView {
-    func loadImageURL(from urlString: String, palceHolder: UIImage? = nil) {
-        self.image = palceHolder
+    func loadImageURL(from url: String, completion: @escaping () -> Void) {
+        self.image = nil
         
-        guard let url = URL(string: urlString) else {
+        guard let url = URL(string: url) else {
+            completion()
             return
         }
-        URLSession.shared.dataTask(with: url) { data, responce, error in
-            if error != nil {
-                return
+        
+        URLSession.shared.dataTask(with: url) { [weak self] data, _, error in
+            DispatchQueue.main.async {
+                if let data = data, let image = UIImage(data: data) {
+                    self?.image = image
+                } else {
+                    self?.image = UIImage(named: "errorImage")
+                }
+                completion()
             }
-            guard let data = data, let image = UIImage(data: data) else {
-                return
-            }
-            DispatchQueue.main.sync {
-                self.image = image
-            }
-        }
-        .resume()
+        }.resume()
     }
-    
-    func checkForDownload(from urlString: String, shouldSaveToPhotos: Bool = false) {
-            guard let url = URL(string: urlString) else {
-                return
-            }
-            URLSession.shared.dataTask(with: url) { data, response, error in
-                if error != nil {
-                    return
-                }
-                guard let data = data, let image = UIImage(data: data) else {
-                    return
-                }
-                DispatchQueue.main.async {
-                    self.image = image
-                    if shouldSaveToPhotos {
-                        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
-                    }
-                }
-            }.resume()
-        }
 }

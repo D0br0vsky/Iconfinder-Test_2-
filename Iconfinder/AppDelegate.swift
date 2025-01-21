@@ -9,14 +9,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? ) -> Bool {
         window = UIWindow(frame: UIScreen.main.bounds)
+        
         let alphaModule = AlphaModuleFactory().make()
-        let nav = UINavigationController(rootViewController: alphaModule)
-        let appearance = UINavigationBarAppearance()
-        appearance.shadowImage = nil
-        appearance.shadowColor = nil
-        appearance.backgroundColor = .white
-        nav.navigationBar.standardAppearance = appearance
-        nav.navigationBar.scrollEdgeAppearance = appearance
+        
+        let nav = CustomNavigationController(rootViewController: alphaModule)
         window?.rootViewController = nav
         window?.makeKeyAndVisible()
         return true

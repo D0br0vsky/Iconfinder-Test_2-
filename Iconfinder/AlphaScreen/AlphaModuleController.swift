@@ -2,21 +2,23 @@
 import UIKit
 
 protocol AlphaControllerProtocol: AnyObject {
-    
     func update(model: AlphaModuleView.Model)
     func showError()
-    func showEmpty()
-    func startLoader()
-    func stopLoader()
+    func showEmpty(text: String)
+    func startLoading()
+    func stopLoading()
+    func hideAllStates()
 }
 
 final class AlphaModuleController: UIViewController, UISearchBarDelegate {
-    private let presenter: AlphaModulePresenter
     private let searchBar = UISearchBar()
+    private let presenter: AlphaModulePresenter
     private lazy var customView = AlphaModuleView(presenter: presenter)
+    private let screenStateViewModels: ScreenStateViewModelsProtocol
     
-    init(presenter: AlphaModulePresenter) {
+    init(presenter: AlphaModulePresenter, screenStateViewModels: ScreenStateViewModelsProtocol) {
         self.presenter = presenter
+        self.screenStateViewModels = screenStateViewModels
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -26,12 +28,24 @@ final class AlphaModuleController: UIViewController, UISearchBarDelegate {
     }
     
     override func loadView() {
-        super.viewDidLoad()
+        super.loadView()
         view = customView
     }
     
     override func viewDidLoad() {
-        presenter.viewDidLoad()
+        super.viewDidLoad()
+        if let screenStateViewModels = screenStateViewModels as? UIView {
+                view.addSubview(screenStateViewModels)
+                screenStateViewModels.translatesAutoresizingMaskIntoConstraints = false
+                NSLayoutConstraint.activate([
+                    screenStateViewModels.topAnchor.constraint(equalTo: view.topAnchor, constant: 200),
+                    screenStateViewModels.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+                    screenStateViewModels.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+                    screenStateViewModels.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+                ])
+            }
+
+            presenter.viewDidLoad()
     }
     
     private func setupSearchBar() {
@@ -42,31 +56,33 @@ final class AlphaModuleController: UIViewController, UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
             guard let query = searchBar.text, !query.isEmpty else { return }
             presenter.updateQuery(query)
+            presenter.searchQueryUpdate()
             searchBar.resignFirstResponder()
         }
 }
 
 // MARK: - AlphaControllerProtocol
-extension AlphaModuleController: AlphaControllerProtocol { 
-
+extension AlphaModuleController: AlphaControllerProtocol {
     func update(model: AlphaModuleView.Model) {
         customView.update(model: model)
     }
-    
-    func showEmpty() {
-        customView.showEmpty()
-    }
-    
-    func startLoader() {
-        customView.startLoader()
-    }
-    
-    func stopLoader() {
-        customView.stopLoader()
-    }
-    
     func showError() {
-        customView.showError()
+        screenStateViewModels.showError()
+    }
+    
+    func showEmpty(text: String) {
+        screenStateViewModels.showEmpty(text: text)
+    }
+    
+    func startLoading() {
+        screenStateViewModels.startLoading()
+    }
+    
+    func stopLoading() {
+        screenStateViewModels.stopLoading()
+    }
+    
+    func hideAllStates() {
+        screenStateViewModels.hideAllStates()
     }
 }
-

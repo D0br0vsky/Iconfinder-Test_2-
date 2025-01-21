@@ -16,7 +16,7 @@ struct APIEndpoint {
         
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        request.timeoutInterval = 10
+        request.timeoutInterval = 200
         request.allHTTPHeaderFields = [
             "accept": "application/json",
             "Authorization": "Bearer JgVog6mt6EMHpy7ex9hoFOv3zcn6j85JhZBko7jVM1eLjAlJasZRSXqG7SYbvAsM"
