@@ -2,7 +2,7 @@
 import UIKit
 
 protocol ScreenStateViewModelsProtocol: UIView {
-    func showError()
+    func showError(text: String)
     func showEmpty(text: String)
     func startLoading()
     func stopLoading()
@@ -42,9 +42,10 @@ final class ScreenStateViewModels: UIView {
 
 // MARK: - ScreenStateViewModelsProtocol
 extension ScreenStateViewModels: ScreenStateViewModelsProtocol {
-    func showError() {
+    func showError(text: String) {
         DispatchQueue.main.async { [weak self] in
             self?.hideAllStates()
+            self?.emptyView.setMessage(text)
             self?.errorView.isHidden = false
             self?.isUserInteractionEnabled = false
             self?.bringSubviewToFront(self?.errorView ?? UIView())

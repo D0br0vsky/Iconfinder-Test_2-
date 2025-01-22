@@ -1,5 +1,5 @@
-
 import UIKit
+import Kingfisher
 
 final class AlphaModuleViewCell: UICollectionViewCell {
     static let id = "AlphaModuleViewCell"
@@ -10,9 +10,8 @@ final class AlphaModuleViewCell: UICollectionViewCell {
         let maxSize: String
         let tags: String
         let downloadURL: String
-
+        
     }
-    
     
     private lazy var screenStateViewModels: ScreenStateViewModels = {
         let view = ScreenStateViewModels()
@@ -93,9 +92,8 @@ final class AlphaModuleViewCell: UICollectionViewCell {
     
     func update(model: Model) {
         self.model = model
-        screenStateViewModels.startLoading()
-        imageCard.loadImageURL(from: model.previewURL) { [weak self] in
-            self?.screenStateViewModels.hideAllStates()
+        if let url = URL(string: model.previewURL) {
+            imageCard.kf.setImage(with: url, placeholder: UIImage(named: "placeholder"), options: [.transition(.fade(0.2))])
         }
         sizeLabel.text = model.maxSize
         tagsLabel.text = model.tags
@@ -103,6 +101,7 @@ final class AlphaModuleViewCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        model = nil
         sizeLabel.text = nil
         tagsLabel.text = nil
         imageCard.image = nil
@@ -194,14 +193,21 @@ private extension AlphaModuleViewCell {
     }
     
     @objc func downloadButtonTapped() {
-        guard let model = model else { return }
+        guard let model = model else {
+            return
+        }
+        
         guard !model.downloadURL.isEmpty else {
             return
         }
-        downloadButton.setImage(UIImage(named: "ok"), for: .normal)
+
+        DispatchQueue.main.async {
+            self.downloadButton.setImage(UIImage(named: "ok"), for: .normal)
+        }
         presenter?.didTapDownloadButton(with: model.downloadURL)
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
             self?.downloadButton.setImage(UIImage(named: "download"), for: .normal)
         }
     }
+
 }

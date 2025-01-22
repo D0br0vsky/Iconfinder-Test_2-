@@ -72,7 +72,7 @@ final class AlphaModuleView: UIView, UICollectionViewDelegate {
     
     func update(model: Model) {
         DispatchQueue.main.async { [weak self] in
-            self?.model = model // check it
+            self?.model = model
             self?.data = model.items
             self?.collectionView.reloadData()
         }
@@ -111,20 +111,25 @@ extension AlphaModuleView: UIScrollViewDelegate {
 // MARK: - UICollectionViewDataSource
 extension AlphaModuleView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        model?.items.count ?? 0
+        return model?.items.count ?? 0
     }
-    
+
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: AlphaModuleViewCell.id, for: indexPath) as? AlphaModuleViewCell else {
-            return UICollectionViewCell()
+            fatalError("Failed to create AlphaModuleViewCell")
         }
         
-        let item = data[indexPath.item]
+        guard let item = model?.items[indexPath.item] else {
+            return UICollectionViewCell()
+        }
+
         cell.update(model: item)
         cell.presenter = presenter
         return cell
     }
 }
+
+
 
 // MARK: - Setup Subviews and Constraints
 private extension AlphaModuleView {

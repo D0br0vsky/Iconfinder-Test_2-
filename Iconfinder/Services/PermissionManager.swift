@@ -1,23 +1,26 @@
 import Photos
 
 protocol PermissionManagerProtocol {
-    func requestPhotoLibraryPermission(complition: @escaping (Bool) -> Void)
+    func requestPhotoLibraryPermission(completion: @escaping (Bool) -> Void)
 }
 
 final class PermissionManager: PermissionManagerProtocol {
-    func requestPhotoLibraryPermission(complition: @escaping (Bool) -> Void) {
-        let status = PHPhotoLibrary.authorizationStatus()
+    func requestPhotoLibraryPermission(completion: @escaping (Bool) -> Void) {
+        let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
         switch status {
-        case .authorized:
-            complition(true)
+        case .authorized, .limited:
+            completion(true)
         case .notDetermined:
-            PHPhotoLibrary.requestAuthorization { newStatus in
+            PHPhotoLibrary.requestAuthorization(for: .readWrite) { newStatus in
                 DispatchQueue.main.async {
-                    complition(newStatus == .authorized)
+                    completion(newStatus == .authorized || newStatus == .limited)
                 }
             }
-        default:
-            complition(false)
+        case .denied, .restricted:
+            completion(false)
+        @unknown default:
+            completion(false)
         }
     }
 }
+

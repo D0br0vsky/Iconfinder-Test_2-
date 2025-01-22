@@ -3,7 +3,7 @@ import UIKit
 
 protocol AlphaControllerProtocol: AnyObject {
     func update(model: AlphaModuleView.Model)
-    func showError()
+    func showError(text: String)
     func showEmpty(text: String)
     func startLoading()
     func stopLoading()
@@ -56,8 +56,8 @@ extension AlphaModuleController: AlphaControllerProtocol {
     func update(model: AlphaModuleView.Model) {
         customView.update(model: model)
     }
-    func showError() {
-        screenStateViewModels.showError()
+    func showError(text: String) {
+        screenStateViewModels.showError(text: text)
     }
     
     func showEmpty(text: String) {

@@ -1,12 +1,13 @@
-
 import UIKit
+import Photos
 import Dispatch
+import Kingfisher
 
 protocol AlphaPresenterProtocol {
     func searchQueryUpdate()
     func updateQuery(_ query: String)
     func didTapDownloadButton(with url: String)
-    func loadIconsData() // questionable
+    func loadIconsData()
 }
 
 final class AlphaModulePresenter: AlphaPresenterProtocol {
@@ -14,7 +15,7 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
     
     private let dataLoader: DataLoaderProtocol
     private let dataService: DataServiceProtocol
-    private let downloadImageUseCase: DownloadImageUseCaseProtocol
+    private let permissionManager: PermissionManagerProtocol
     
     private var loadedIconsForView: [IconsInformationModel] = []
     private var searchQuery: String = ""
@@ -22,10 +23,10 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
     private var page: Int = 1
 
     
-    init(dataLoader: DataLoaderProtocol, dataService: DataServiceProtocol, downloadImageUseCase: DownloadImageUseCaseProtocol) {
+    init(dataLoader: DataLoaderProtocol, dataService: DataServiceProtocol, permissionManager: PermissionManagerProtocol) {
         self.dataLoader = dataLoader
         self.dataService = dataService
-        self.downloadImageUseCase = downloadImageUseCase
+        self.permissionManager = permissionManager
     }
     
     func searchQueryUpdate() {
@@ -37,19 +38,29 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
         searchQuery = query
     }
     
-    func didTapDownloadButton(with url: String) { // finalize later
-        guard !url.isEmpty else {
+    func didTapDownloadButton(with url: String) {
+        guard let imageURL = URL(string: url) else {
             return
         }
-        downloadImageUseCase.execute(url: url, shouldSaveToPhotos: true) { result in
+
+        permissionManager.requestPhotoLibraryPermission { [weak self] permission in
+            guard permission else {
+                self?.view?.showError(text: "Нет доступа к Фотоальбому.")
+                return
+            }
+
+            KingfisherManager.shared.retrieveImage(with: imageURL) { result in
                 switch result {
-                case .success:
-                    print("Картинка успешно скачана!")
+                case .success(let data):
+                    DispatchQueue.main.async {
+                        UIImageWriteToSavedPhotosAlbum(data.image, nil, nil, nil)
+                    }
                 case .failure(let error):
-                    print("Произошла ошибка: \(error.localizedDescription)")
+                    print("Ошибка загрузки изображения: \(error.localizedDescription)")
                 }
             }
         }
+    }
     
     func viewDidLoad() {
         loadIconsData()
@@ -66,7 +77,7 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
             loadedIconsForView.removeAll()
             view?.update(model: AlphaModuleView.Model(items: []))
             view?.stopLoading()
-            view?.showEmpty(text: EmptyStatusModel.emptySearchTerm)
+            view?.showEmpty(text: TextStatusModel.emptySearchTerm)
             isLoading = false
             return
         }
@@ -79,7 +90,7 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
             case .success(let dataIcons):
                 if dataIcons.icons.isEmpty {
                     loadedIconsForView.removeAll()
-                    self.view?.showEmpty(text: EmptyStatusModel.nothingFound)
+                    self.view?.showEmpty(text: TextStatusModel.nothingFound)
                     self.view?.update(model: AlphaModuleView.Model(items: []))
                 } else {
                     self.convertAndAddsDataIcon(dataIcons.icons)
@@ -87,7 +98,7 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
                 }
                 self.isLoading = false
             case .failure(_):
-                self.view?.showError()
+                self.view?.showError(text: TextStatusModel.connectionError)
             }
         }
         
@@ -102,21 +113,34 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
 
 // MARK: - Private Helpers
 private extension AlphaModulePresenter {
-    func updateUI() {
+    private func updateUI() {
         guard !loadedIconsForView.isEmpty else {
-            view?.showEmpty(text: EmptyStatusModel.nothingFound)
+            view?.showEmpty(text: "Нет данных для отображения")
             return
         }
+
         let items: [AlphaModuleViewCell.Model] = loadedIconsForView.map { iconsData in
-                .init(previewURL: iconsData.previewURL, maxSize: iconsData.maxSize, tags: "\(iconsData.tags)", downloadURL: iconsData.downloadURL)
+            return AlphaModuleViewCell.Model(
+                previewURL: iconsData.previewURL,
+                maxSize: iconsData.maxSize,
+                tags: "\(iconsData.tags)",
+                downloadURL: iconsData.downloadURL
+            )
         }
+
         let viewModel = AlphaModuleView.Model(items: items)
         view?.update(model: viewModel)
     }
+
     
     func convertAndAddsDataIcon(_ dataIcons: [IconDTO]) {
         let iconArray: [Int: [IconDTO]] = groupIconsById(dataIcons)
+        
         for (iconId, iconInfo) in iconArray {
+            guard !loadedIconsForView.contains(where: { $0.iconID == iconId }) else {
+                continue
+            }
+            
             let (sizeMaxWidth, sizeMaxHeight) = getMaxDimensions(from: iconInfo)
             let tags = iconInfo.first?.tags ?? []
             

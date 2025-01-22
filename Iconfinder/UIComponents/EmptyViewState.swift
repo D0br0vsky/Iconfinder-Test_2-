@@ -4,7 +4,6 @@ import UIKit
 final class EmptyViewState: UIView {    
     private lazy var messageLabel: UILabel = {
         let label = UILabel()
-        label.text = "empty request"
         label.font = .boldSystemFont(ofSize: 16)
         label.textAlignment = .center
         label.textColor = .black
@@ -35,19 +34,12 @@ private extension EmptyViewState {
     
     func setupSubviews() {
         addSubview(messageLabel)
-//        baseShape.addSubview(messageLabel)
     }
     
     func setupConstraints() {
         messageLabel.translatesAutoresizingMaskIntoConstraints = false
-//        baseShape.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-//            baseShape.topAnchor.constraint(equalTo: topAnchor),
-//            baseShape.trailingAnchor.constraint(equalTo: trailingAnchor),
-//            baseShape.leadingAnchor.constraint(equalTo: leadingAnchor),
-//            baseShape.bottomAnchor.constraint(equalTo: bottomAnchor),
-
             messageLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
             messageLabel.centerYAnchor.constraint(equalTo: centerYAnchor)
         ])
