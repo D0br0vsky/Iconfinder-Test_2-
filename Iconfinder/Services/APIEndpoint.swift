@@ -23,6 +23,25 @@ struct APIEndpoint {
         ]
         return request
     }
+    
+    func makeRequestLoadingImage(loadingLink: String) -> URLRequest? {
+        guard var components = URLComponents(string: loadingLink) else {
+            return nil
+        }
+        components.queryItems = queryItem
+        guard let url = components.url else {
+            return nil
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.timeoutInterval = 200
+        request.allHTTPHeaderFields = [
+            "accept": "application/json",
+            "Authorization": "Bearer JgVog6mt6EMHpy7ex9hoFOv3zcn6j85JhZBko7jVM1eLjAlJasZRSXqG7SYbvAsM"
+        ]
+        return request
+    }
 }
 
 extension APIEndpoint {

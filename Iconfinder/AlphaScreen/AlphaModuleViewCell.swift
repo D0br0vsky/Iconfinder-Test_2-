@@ -12,12 +12,7 @@ final class AlphaModuleViewCell: UICollectionViewCell {
         let downloadURL: String
         
     }
-    
-    private lazy var screenStateViewModels: ScreenStateViewModels = {
-        let view = ScreenStateViewModels()
-        return view
-    }()
-    
+
     private lazy var imageCard: UIImageView = {
         let image = UIImageView()
         image.contentMode = .scaleAspectFit
@@ -116,7 +111,6 @@ private extension AlphaModuleViewCell {
     }
     
     func setupSubviews() {
-        contentView.addSubview(screenStateViewModels)
         contentView.addSubview(baseShape)
         baseShape.addSubview(imageCard)
         baseShape.addSubview(sizeShape)
@@ -129,7 +123,6 @@ private extension AlphaModuleViewCell {
     }
     
     func setupConstraints() {
-        screenStateViewModels.translatesAutoresizingMaskIntoConstraints = false
         baseShape.translatesAutoresizingMaskIntoConstraints = false
         imageCard.translatesAutoresizingMaskIntoConstraints = false
         sizeShape.translatesAutoresizingMaskIntoConstraints = false
@@ -183,12 +176,7 @@ private extension AlphaModuleViewCell {
             downloadButton.topAnchor.constraint(equalTo: tagsShape.bottomAnchor, constant: 10),
             downloadButton.trailingAnchor.constraint(equalTo: baseShape.trailingAnchor, constant: -10),
             downloadButton.leadingAnchor.constraint(equalTo: baseShape.leadingAnchor, constant: 10),
-            downloadButton.heightAnchor.constraint(equalToConstant: 40),
-            
-            screenStateViewModels.topAnchor.constraint(equalTo: contentView.topAnchor),
-            screenStateViewModels.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            screenStateViewModels.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            screenStateViewModels.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            downloadButton.heightAnchor.constraint(equalToConstant: 40)
         ])
     }
     

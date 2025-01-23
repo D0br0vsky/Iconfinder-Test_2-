@@ -39,13 +39,15 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
     }
     
     func didTapDownloadButton(with url: String) {
+        // let dispatchGroup = DispatchGroup()
+        
         guard let imageURL = URL(string: url) else {
             return
         }
 
         permissionManager.requestPhotoLibraryPermission { [weak self] permission in
             guard permission else {
-                self?.view?.showError(text: "Нет доступа к Фотоальбому.")
+                self?.view?.showError(text: TextStatusModel.accessError)
                 return
             }
 
@@ -115,7 +117,7 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
 private extension AlphaModulePresenter {
     private func updateUI() {
         guard !loadedIconsForView.isEmpty else {
-            view?.showEmpty(text: "Нет данных для отображения")
+            view?.showEmpty(text: TextStatusModel.nothingFound)
             return
         }
 
