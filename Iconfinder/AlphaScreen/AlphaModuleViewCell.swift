@@ -197,5 +197,4 @@ private extension AlphaModuleViewCell {
             self?.downloadButton.setImage(UIImage(named: "download"), for: .normal)
         }
     }
-
 }

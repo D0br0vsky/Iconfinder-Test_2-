@@ -3,7 +3,7 @@ import Foundation
 
 protocol DataServiceProtocol {
     func fetchIcons(query: String, count: Int, completion: @escaping (Result<IconsResponse, Error>) -> Void)
-    //func prepareImageDownload(query: String, completion: @escaping (Result<IconsResponse, Error>) -> Void)
+    func downloadImage(from url: String, completion: @escaping (Result<Data, Error>) -> Void)
 }
 
 final class DataService: DataServiceProtocol {
@@ -29,14 +29,14 @@ final class DataService: DataServiceProtocol {
         }
     }
     
-    func prepareImageDownload(query: String, completion: @escaping (Result<String, Error>) -> Void) {
-        let apiendpointer = APIEndpoint(path: "", queryItem: [])
-        guard let request = apiendpointer.makeRequestLoadingImage(loadingLink: query) else {
-            completion(.failure(NSError(domain: "Invalid request", code: 2)))
+    func downloadImage(from url: String, completion: @escaping (Result<Data, Error>) -> Void) {
+        let apiEndpoint = APIEndpoint(path: "", queryItem: [])
+        guard let request = apiEndpoint.makeRequestLoadingImage(loadingLink: url) else {
+            completion(.failure(NSError(domain: "Invalid URL", code: -1)))
             return
         }
         
-        dataLoader.fetchData(url: request) { (result: Result<String, Error>) in
+        dataLoader.fetchRawData(url: request) { result in
             switch result {
             case .success(let data):
                 completion(.success(data))

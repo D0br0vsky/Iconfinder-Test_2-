@@ -1,7 +1,6 @@
 import UIKit
 import Photos
 import Dispatch
-import Kingfisher
 
 protocol AlphaPresenterProtocol {
     func searchQueryUpdate()
@@ -39,26 +38,31 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
     }
     
     func didTapDownloadButton(with url: String) {
-        // let dispatchGroup = DispatchGroup()
-        
-        guard let imageURL = URL(string: url) else {
-            return
-        }
-
         permissionManager.requestPhotoLibraryPermission { [weak self] permission in
             guard permission else {
                 self?.view?.showError(text: TextStatusModel.accessError)
                 return
             }
-
-            KingfisherManager.shared.retrieveImage(with: imageURL) { result in
+            
+            self?.dataService.downloadImage(from: url) { [weak self] result in
                 switch result {
                 case .success(let data):
-                    DispatchQueue.main.async {
-                        UIImageWriteToSavedPhotosAlbum(data.image, nil, nil, nil)
+                    guard let image = UIImage(data: data) else {
+                        return
                     }
-                case .failure(let error):
-                    print("Ошибка загрузки изображения: \(error.localizedDescription)")
+                    
+                    DispatchQueue.main.async {
+                        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+                        self?.view?.showEmpty(text: TextStatusModel.successfulDownload)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                            self?.view?.hideAllStates()
+                        }
+                    }
+                case .failure(_):
+                    self?.view?.showError(text: TextStatusModel.downloadError)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                        self?.view?.hideAllStates()
+                    }
                 }
             }
         }
