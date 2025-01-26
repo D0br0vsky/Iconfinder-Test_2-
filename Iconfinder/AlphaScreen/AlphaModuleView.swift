@@ -129,8 +129,6 @@ extension AlphaModuleView: UICollectionViewDataSource {
     }
 }
 
-
-
 // MARK: - Setup Subviews and Constraints
 private extension AlphaModuleView {
     func commonInit() {

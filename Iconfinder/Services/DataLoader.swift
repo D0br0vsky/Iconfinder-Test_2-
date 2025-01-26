@@ -1,4 +1,3 @@
-
 import Foundation
 
 protocol DataLoaderProtocol {
@@ -50,7 +49,6 @@ final class DataLoader: DataLoaderProtocol {
                 completion(.failure(NSError(domain: "No data", code: -1)))
                 return
             }
-            
             completion(.success(data))
         }
         task.resume()

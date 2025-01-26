@@ -1,4 +1,3 @@
-
 struct IconsResponse: Codable {
     let totalCount: Int
     let icons: [IconDTO]

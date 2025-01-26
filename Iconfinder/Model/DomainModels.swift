@@ -1,4 +1,3 @@
-
 struct IconsInformationModel {
     let iconID: Int
     let maxSize: String

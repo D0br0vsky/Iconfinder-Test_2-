@@ -87,7 +87,7 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
         view?.startLoading()
         
         dispatchGroup.enter()
-        iconsLoader.loadIcons(query: searchQuery, page: 10 * page) { [weak self] result in
+        iconsLoader.loadIcons(query: searchQuery, page: page) { [weak self] result in
             defer { dispatchGroup.leave() }
             guard let self = self else { return }
             self.isLoading = false
@@ -111,9 +111,9 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
     }
 }
 
-// MARK: - Private Helpers
+// MARK: - Private Methods
 private extension AlphaModulePresenter {
-    private func updateUI() {
+    func updateUI() {
         guard !loadedIconsForView.isEmpty else {
             view?.showEmpty(text: TextStatusModel.nothingFound)
             return
@@ -140,7 +140,7 @@ private extension AlphaModulePresenter {
         isLoading = false
     }
     
-    private func handleLoadedIcons(_ dataIcons: [IconDTO]) {
+    func handleLoadedIcons(_ dataIcons: [IconDTO]) {
         let iconsData = iconDataMapper.map(dataIcons)
         if iconsData.isEmpty {
             loadedIconsForView.removeAll()
@@ -152,46 +152,4 @@ private extension AlphaModulePresenter {
             updateUI()
         }
     }
-    
-//    func convertAndAddsDataIcon(_ dataIcons: [IconDTO]) {
-//        let iconArray: [Int: [IconDTO]] = groupIconsById(dataIcons)
-//        
-//        for (iconId, iconInfo) in iconArray {
-//            guard !loadedIconsForView.contains(where: { $0.iconID == iconId }) else {
-//                continue
-//            }
-//            
-//            let (sizeMaxWidth, sizeMaxHeight) = getMaxDimensions(from: iconInfo)
-//            let tags = iconInfo.first?.tags ?? []
-//            
-//            let previewURL = getUrl(from: iconInfo, matchingWidth: sizeMaxWidth, matchingHeight: sizeMaxHeight, isPreview: true)
-//            let downloadURL = getUrl(from: iconInfo, matchingWidth: sizeMaxWidth, matchingHeight: sizeMaxHeight, isPreview: false)
-//            
-//            let iconsInformationModel = IconsInformationModel(iconID: iconId, maxSize: "\(sizeMaxWidth)px x \(sizeMaxHeight)px", tags: tags, previewURL: previewURL, downloadURL: downloadURL)
-//            loadedIconsForView.append(iconsInformationModel)
-//        }
-//    }
-    
-//    func groupIconsById(_ icons: [IconDTO]) -> [Int: [IconDTO]]{
-//        var iconArray: [Int: [IconDTO]] = [:]
-//        for icon in icons {
-//            iconArray[icon.iconID, default:[]].append(icon)
-//        }
-//        return iconArray
-//    }
-    
-//    func getMaxDimensions(from icons: [IconDTO]) -> (width: Int, height: Int) {
-//        let maxWidth = icons.compactMap { $0.rasterSizes?.compactMap { $0.sizeWidth }.max() }.max() ?? 0
-//        let maxHeight = icons.compactMap { $0.rasterSizes?.compactMap { $0.sizeHeight }.max() }.max() ?? 0
-//        return (maxWidth, maxHeight)
-//    }
-    
-//    func getUrl(from icons: [IconDTO], matchingWidth: Int, matchingHeight: Int, isPreview: Bool) -> String {
-//        return icons.compactMap { icon in
-//            icon.rasterSizes?
-//                .filter { $0.sizeWidth == matchingWidth && $0.sizeHeight == matchingHeight }
-//                .flatMap { $0.formats.compactMap { isPreview ? $0.previewURL : $0.downloadURL } }
-//                .first
-//        }.first ?? ""
-//    }
 }
