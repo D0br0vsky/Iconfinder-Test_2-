@@ -22,7 +22,6 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
     private var searchQuery: String = ""
     private var isLoading: Bool = false
     private var page: Int = 1
-
     
     init(dataLoader: DataLoaderProtocol, dataService: DataServiceProtocol, permissionManager: PermissionManagerProtocol, iconDataMapper: IconDataMapperProtocol, iconsLoader: IconsLoaderProtocol) {
         self.dataLoader = dataLoader
@@ -62,7 +61,7 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
                             self?.view?.hideAllStates()
                         }
                     }
-                case .failure(_):
+                case .failure(let error):
                     self?.view?.showError(text: TextStatusModel.downloadError)
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                         self?.view?.hideAllStates()

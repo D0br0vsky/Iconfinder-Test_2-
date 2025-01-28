@@ -54,5 +54,3 @@ final class DataLoader: DataLoaderProtocol {
         task.resume()
     }
 }
-
-

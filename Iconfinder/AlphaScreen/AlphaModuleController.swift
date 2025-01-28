@@ -1,4 +1,3 @@
-
 import UIKit
 
 protocol AlphaControllerProtocol: AnyObject {
@@ -15,7 +14,7 @@ final class AlphaModuleController: UIViewController, UISearchBarDelegate {
     private let presenter: AlphaModulePresenter
     private lazy var customView = AlphaModuleView(presenter: presenter)
     private let screenStateViewModels: ScreenStateViewModelsProtocol
-    
+
     init(presenter: AlphaModulePresenter, screenStateViewModels: ScreenStateViewModelsProtocol) {
         self.presenter = presenter
         self.screenStateViewModels = screenStateViewModels
@@ -44,11 +43,11 @@ final class AlphaModuleController: UIViewController, UISearchBarDelegate {
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-            guard let query = searchBar.text, !query.isEmpty else { return }
-            presenter.updateQuery(query)
-            presenter.searchQueryUpdate()
-            searchBar.resignFirstResponder()
-        }
+        guard let query = searchBar.text, !query.isEmpty else { return }
+        presenter.updateQuery(query)
+        presenter.searchQueryUpdate()
+        searchBar.resignFirstResponder()
+    }
 }
 
 // MARK: - AlphaControllerProtocol

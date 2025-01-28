@@ -84,8 +84,6 @@ extension ScreenStateViewModels: ScreenStateViewModelsProtocol {
             self?.isUserInteractionEnabled = false
         }
     }
-    
-   
 }
 
 // MARK: - Setup Subviews and Constraints

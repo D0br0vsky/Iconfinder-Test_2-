@@ -1,4 +1,3 @@
-
 import UIKit
 
 final class ErrorViewState: UIView {
@@ -21,8 +20,8 @@ final class ErrorViewState: UIView {
     }
     
     func setMessage(_ text: String) {
-            messageLabel.text = text
-        }
+        messageLabel.text = text
+    }
 }
 
 // MARK: - Setup Subviews and Constraints

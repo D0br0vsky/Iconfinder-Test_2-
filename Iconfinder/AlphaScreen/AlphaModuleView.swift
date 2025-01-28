@@ -1,4 +1,3 @@
-
 import UIKit
 
 final class AlphaModuleView: UIView, UICollectionViewDelegate {
@@ -40,7 +39,7 @@ final class AlphaModuleView: UIView, UICollectionViewDelegate {
         return button
     }()
     
-    private lazy var collectionView:  UICollectionView  = {
+    private lazy var collectionView: UICollectionView  = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         layout.minimumLineSpacing = 10
@@ -113,7 +112,7 @@ extension AlphaModuleView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return model?.items.count ?? 0
     }
-
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: AlphaModuleViewCell.id, for: indexPath) as? AlphaModuleViewCell else {
             fatalError("Failed to create AlphaModuleViewCell")
@@ -169,7 +168,7 @@ private extension AlphaModuleView {
             collectionView.topAnchor.constraint(equalTo: topShape.bottomAnchor, constant: 5),
             collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
     }
     
@@ -184,4 +183,3 @@ private extension AlphaModuleView {
         searchBar.resignFirstResponder()
     }
 }
-

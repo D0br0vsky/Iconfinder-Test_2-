@@ -12,10 +12,10 @@ final class IconDataMapper: IconDataMapperProtocol {
         }
     }
     
-    private func groupIconsById(_ icons: [IconDTO]) -> [Int: [IconDTO]]{
+    private func groupIconsById(_ icons: [IconDTO]) -> [Int: [IconDTO]] {
         var iconArray: [Int: [IconDTO]] = [:]
         for icon in icons {
-            iconArray[icon.iconID, default:[]].append(icon)
+            iconArray[icon.iconID, default: []].append(icon)
         }
         return iconArray
     }
@@ -35,7 +35,6 @@ final class IconDataMapper: IconDataMapperProtocol {
             downloadURL: downloadURL
         )
     }
-    
     
     private func getMaxDimensions(from icons: [IconDTO]) -> (width: Int, height: Int) {
         let maxWidth = icons.compactMap { $0.rasterSizes?.compactMap { $0.sizeWidth }.max() }.max() ?? 0

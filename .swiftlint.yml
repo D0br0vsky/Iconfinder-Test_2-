@@ -1,0 +1,41 @@
+# Indentation settings
+indentation_width: 4 # Use 4 spaces for indentation
+
+# Line length settings
+line_length:
+  warning: 210 # Warning for lines longer than 150 characters
+  error: 280   # Error for lines longer than 200 characters
+
+# Rules for formatting
+vertical_whitespace: warning # Prohibit excessive blank lines
+
+# Excluded files and directories
+excluded:
+  - Pods
+  - MBUITest
+
+# Disabled rules
+disabled_rules:
+  - trailing_whitespace
+  - identifier_name
+  - type_name
+  # Removed 'line_length' from here to avoid conflicts
+
+# Function parameter count settings
+function_parameter_count:
+  warning: 10 # Warning for functions with more than 10 parameters
+  error: 15   # Error for functions with more than 15 parameters
+
+# File length settings
+file_length:
+  warning: 500 # Warning for files with more than 500 lines
+  error: 1000  # Error for files with more than 1000 lines
+
+# Type body length settings
+type_body_length:
+  warning: 400 # Warning for types with more than 400 lines
+  error: 450   # Error for types with more than 450 lines
+
+# Opt-in rules
+opt_in_rules:
+  - indentation_width
