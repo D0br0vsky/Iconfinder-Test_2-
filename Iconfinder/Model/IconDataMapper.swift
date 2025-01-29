@@ -1,26 +1,26 @@
 import Foundation
 
 protocol IconDataMapperProtocol {
-    func map(_ dataIcons: [IconDTO]) -> [IconsInformationModel]
+    func map(_ dataIcons: [Icon]) -> [IconsInformationModel]
 }
 
 final class IconDataMapper: IconDataMapperProtocol {
-    func map(_ dataIcons: [IconDTO]) -> [IconsInformationModel] {
+    func map(_ dataIcons: [Icon]) -> [IconsInformationModel] {
         let groupedIcons = groupIconsById(dataIcons)
         return groupedIcons.compactMap { iconId, iconInfo in
             createIconsInformationModel(iconId: iconId, iconInfo: iconInfo)
         }
     }
     
-    private func groupIconsById(_ icons: [IconDTO]) -> [Int: [IconDTO]] {
-        var iconArray: [Int: [IconDTO]] = [:]
+    private func groupIconsById(_ icons: [Icon]) -> [Int: [Icon]] {
+        var iconArray: [Int: [Icon]] = [:]
         for icon in icons {
             iconArray[icon.iconID, default: []].append(icon)
         }
         return iconArray
     }
     
-    private func createIconsInformationModel(iconId: Int, iconInfo: [IconDTO]) -> IconsInformationModel? {
+    private func createIconsInformationModel(iconId: Int, iconInfo: [Icon]) -> IconsInformationModel? {
         let (sizeMaxWidth, sizeMaxHeight) = getMaxDimensions(from: iconInfo)
         guard let tags = iconInfo.first?.tags else { return nil }
         
@@ -36,13 +36,13 @@ final class IconDataMapper: IconDataMapperProtocol {
         )
     }
     
-    private func getMaxDimensions(from icons: [IconDTO]) -> (width: Int, height: Int) {
+    private func getMaxDimensions(from icons: [Icon]) -> (width: Int, height: Int) {
         let maxWidth = icons.compactMap { $0.rasterSizes?.compactMap { $0.sizeWidth }.max() }.max() ?? 0
         let maxHeight = icons.compactMap { $0.rasterSizes?.compactMap { $0.sizeHeight }.max() }.max() ?? 0
         return (maxWidth, maxHeight)
     }
     
-    private func getUrl(from icons: [IconDTO], matchingWidth: Int, matchingHeight: Int, isPreview: Bool) -> String {
+    private func getUrl(from icons: [Icon], matchingWidth: Int, matchingHeight: Int, isPreview: Bool) -> String {
         return icons.compactMap { icon in
             icon.rasterSizes?
                 .filter { $0.sizeWidth == matchingWidth && $0.sizeHeight == matchingHeight }

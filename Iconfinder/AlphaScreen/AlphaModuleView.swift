@@ -10,33 +10,15 @@ final class AlphaModuleView: UIView, UICollectionViewDelegate {
     private var data: [AlphaModuleViewCell.Model] = []
     private var model: Model?
     
-    private lazy var topShape: UIView = {
-        let shape = UIView()
-        shape.backgroundColor = .gray
-        shape.layer.cornerRadius = 6
-        return shape
-    }()
-    
     private lazy var searchBar: UISearchBar = {
         let searchBar = UISearchBar()
         searchBar.placeholder = "Start your search ..."
-        searchBar.tintColor = .gray
         searchBar.sizeToFit()
-        searchBar.searchTextField.textColor = .white
         searchBar.delegate = self
         searchBar.layer.shadowOpacity = 0
         searchBar.backgroundImage = UIImage()
+        searchBar.barTintColor = .white
         return searchBar
-    }()
-    
-    private lazy var searchButton: UIButton = {
-        let button = UIButton()
-        button.setImage(UIImage(named: "find"), for: .normal)
-        button.backgroundColor = .white
-        button.layer.cornerRadius = 6
-        button.imageView?.contentMode = .scaleAspectFit
-        button.addTarget(self, action: #selector(searchButtonTapped), for: .touchUpInside)
-        return button
     }()
     
     private lazy var collectionView: UICollectionView  = {
@@ -137,49 +119,24 @@ private extension AlphaModuleView {
     }
     
     func setupSubviews() {
-        addSubview(topShape)
+        addSubview(searchBar)
         addSubview(collectionView)
-        topShape.addSubview(searchBar)
-        topShape.addSubview(searchButton)
     }
     
     private func setupConstraints() {
-        topShape.translatesAutoresizingMaskIntoConstraints = false
         searchBar.translatesAutoresizingMaskIntoConstraints = false
-        searchButton.translatesAutoresizingMaskIntoConstraints = false
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            topShape.topAnchor.constraint(equalTo: topAnchor, constant: 100),
-            topShape.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
-            topShape.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
-            topShape.heightAnchor.constraint(equalToConstant: 50),
-            
-            searchBar.topAnchor.constraint(equalTo: topShape.topAnchor, constant: 5),
-            searchBar.leadingAnchor.constraint(equalTo: topShape.leadingAnchor, constant: 5),
-            searchBar.trailingAnchor.constraint(equalTo: searchButton.leadingAnchor, constant: -5),
+            searchBar.topAnchor.constraint(equalTo: topAnchor, constant: 100),
+            searchBar.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
+            searchBar.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
             searchBar.heightAnchor.constraint(equalToConstant: 40),
             
-            searchButton.topAnchor.constraint(equalTo: topShape.topAnchor, constant: 5),
-            searchButton.trailingAnchor.constraint(equalTo: topShape.trailingAnchor, constant: -5),
-            searchButton.widthAnchor.constraint(equalToConstant: 50),
-            searchButton.heightAnchor.constraint(equalToConstant: 40),
-            
-            collectionView.topAnchor.constraint(equalTo: topShape.bottomAnchor, constant: 5),
+            collectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 5),
             collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
-    }
-    
-    @objc private func searchButtonTapped() {
-        guard let query = searchBar.text, !query.isEmpty else {
-            presenter.updateQuery("")
-            presenter.searchQueryUpdate()
-            return
-        }
-        presenter.updateQuery(query)
-        presenter.searchQueryUpdate()
-        searchBar.resignFirstResponder()
     }
 }

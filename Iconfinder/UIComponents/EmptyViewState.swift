@@ -1,11 +1,28 @@
 import UIKit
 
-final class EmptyViewState: UIView {    
-    private lazy var messageLabel: UILabel = {
+final class EmptyViewState: UIView {
+    private lazy var iconImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(systemName: "magnifyingglass")
+        imageView.tintColor = .gray
+        return imageView
+    }()
+    
+    private lazy var titleMessage: UILabel = {
         let label = UILabel()
-        label.font = .boldSystemFont(ofSize: 16)
+        label.font = .boldSystemFont(ofSize: 24)
         label.textAlignment = .center
-        label.textColor = .black
+        label.textColor = .gray
+        label.text = "Empty request"
+        return label
+    }()
+    
+    private lazy var subtitleMessage: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 16)
+        label.textAlignment = .center
+        label.textColor = .gray
+        label.text = "Enter your search query in the search field"
         return label
     }()
     
@@ -18,10 +35,6 @@ final class EmptyViewState: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    func setMessage(_ text: String) {
-        messageLabel.text = text
-    }
 }
 
 // MARK: - Setup Subviews and Constraints
@@ -32,15 +45,27 @@ private extension EmptyViewState {
     }
     
     func setupSubviews() {
-        addSubview(messageLabel)
+        addSubview(iconImageView)
+        addSubview(titleMessage)
+        addSubview(subtitleMessage)
     }
     
     func setupConstraints() {
-        messageLabel.translatesAutoresizingMaskIntoConstraints = false
+        iconImageView.translatesAutoresizingMaskIntoConstraints = false
+        titleMessage.translatesAutoresizingMaskIntoConstraints = false
+        subtitleMessage.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            messageLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
-            messageLabel.centerYAnchor.constraint(equalTo: centerYAnchor)
+            iconImageView.centerXAnchor.constraint(equalTo: centerXAnchor),
+            iconImageView.centerYAnchor.constraint(equalTo: centerYAnchor),
+            iconImageView.widthAnchor.constraint(equalToConstant: 80),
+            iconImageView.heightAnchor.constraint(equalToConstant: 75),
+            
+            titleMessage.topAnchor.constraint(equalTo: iconImageView.bottomAnchor, constant: 20),
+            titleMessage.centerXAnchor.constraint(equalTo: centerXAnchor),
+            
+            subtitleMessage.topAnchor.constraint(equalTo: titleMessage.bottomAnchor, constant: 10),
+            subtitleMessage.centerXAnchor.constraint(equalTo: centerXAnchor)
         ])
     }
 }

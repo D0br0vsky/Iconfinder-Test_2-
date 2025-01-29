@@ -100,6 +100,7 @@ final class AlphaModuleViewCell: UICollectionViewCell {
         sizeLabel.text = nil
         tagsLabel.text = nil
         imageCard.image = nil
+        imageCard.kf.cancelDownloadTask()
     }
 }
 

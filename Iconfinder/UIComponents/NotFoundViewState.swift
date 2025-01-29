@@ -1,9 +1,9 @@
 import UIKit
 
-final class ErrorViewState: UIView {
+final class NotFoundViewState: UIView {
     private lazy var iconImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(systemName: "xmark.bin")
+        imageView.image = UIImage(systemName: "circle.badge.questionmark")
         imageView.tintColor = .gray
         return imageView
     }()
@@ -13,7 +13,7 @@ final class ErrorViewState: UIView {
         label.font = .boldSystemFont(ofSize: 24)
         label.textAlignment = .center
         label.textColor = .gray
-        label.text = "Server error"
+        label.text = "Nothing found"
         return label
     }()
     
@@ -22,9 +22,7 @@ final class ErrorViewState: UIView {
         label.font = .systemFont(ofSize: 16)
         label.textAlignment = .center
         label.textColor = .gray
-        label.numberOfLines = 2
-        label.lineBreakMode = .byWordWrapping
-        label.text = "Something went wrong.\nPlease try again later"
+        label.text = "Try again, but enter a different query"
         return label
     }()
     
@@ -40,7 +38,7 @@ final class ErrorViewState: UIView {
 }
 
 // MARK: - Setup Subviews and Constraints
-private extension ErrorViewState {
+private extension NotFoundViewState {
     func commonInit() {
         setupSubviews()
         setupConstraints()
@@ -61,7 +59,7 @@ private extension ErrorViewState {
             iconImageView.centerXAnchor.constraint(equalTo: centerXAnchor),
             iconImageView.centerYAnchor.constraint(equalTo: centerYAnchor),
             iconImageView.widthAnchor.constraint(equalToConstant: 80),
-            iconImageView.heightAnchor.constraint(equalToConstant: 65),
+            iconImageView.heightAnchor.constraint(equalToConstant: 75),
             
             titleMessage.topAnchor.constraint(equalTo: iconImageView.bottomAnchor, constant: 20),
             titleMessage.centerXAnchor.constraint(equalTo: centerXAnchor),

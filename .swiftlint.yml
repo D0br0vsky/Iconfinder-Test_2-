@@ -39,3 +39,10 @@ type_body_length:
 # Opt-in rules
 opt_in_rules:
   - indentation_width
+
+custom_rules:
+  disallow_multiline_comments:
+    name: "Disallowed Multiline Comments"
+    regex: "/\\*.*\\*/"
+    message: "Avoid using multiline comments (/* */). Use // instead."
+    severity: warning

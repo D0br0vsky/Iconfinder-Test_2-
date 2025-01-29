@@ -1,6 +1,6 @@
 struct IconsResponse: Codable {
     let totalCount: Int
-    let icons: [IconDTO]
+    let icons: [Icon]
     
     enum CodingKeys: String, CodingKey {
         case totalCount = "total_count"
@@ -8,7 +8,7 @@ struct IconsResponse: Codable {
     }
 }
 
-struct IconDTO: Codable {
+struct Icon: Codable {
     let iconID: Int
     let tags: [String]
     let isPremium: Bool

@@ -3,9 +3,9 @@ import Photos
 import Dispatch
 
 protocol AlphaPresenterProtocol {
-    func searchQueryUpdate()
     func updateQuery(_ query: String)
     func didTapDownloadButton(with url: String)
+    func searchQueryUpdate()
     func loadIconsData()
 }
 
@@ -43,7 +43,7 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
     func didTapDownloadButton(with url: String) {
         permissionManager.requestPhotoLibraryPermission { [weak self] permission in
             guard permission else {
-                self?.view?.showError(text: TextStatusModel.accessError)
+                self?.view?.showError()
                 return
             }
             
@@ -56,13 +56,13 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
                     
                     DispatchQueue.main.async {
                         UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
-                        self?.view?.showEmpty(text: TextStatusModel.successfulDownload)
+                        self?.view?.showEmpty()
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                            self?.view?.hideAllStates()
+                            self?.view?.hideEmpty()
                         }
                     }
-                case .failure(let error):
-                    self?.view?.showError(text: TextStatusModel.downloadError)
+                case .failure(_):
+                    self?.view?.showError()
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                         self?.view?.hideAllStates()
                     }
@@ -77,12 +77,12 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
     
     func loadIconsData() {
         let dispatchGroup = DispatchGroup()
-        
         guard !isLoading, !searchQuery.isEmpty else {
             handleEmptyQuery()
             return
         }
         isLoading = true
+        view?.hideAllStates()
         view?.startLoading()
         
         dispatchGroup.enter()
@@ -97,14 +97,13 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
                 handleLoadedIcons(dataIcons.icons)
                 self.isLoading = false
             case .failure(_):
-                self.view?.showError(text: TextStatusModel.connectionError)
+                self.view?.showError()
             }
         }
         
         dispatchGroup.notify(queue: .main) { [weak self] in
             guard let self = self else { return }
             self.view?.stopLoading()
-            self.view?.hideAllStates()
             self.updateUI()
         }
     }
@@ -114,7 +113,6 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
 private extension AlphaModulePresenter {
     func updateUI() {
         guard !loadedIconsForView.isEmpty else {
-            view?.showEmpty(text: TextStatusModel.nothingFound)
             return
         }
 
@@ -132,23 +130,30 @@ private extension AlphaModulePresenter {
     }
     
     func handleEmptyQuery() {
+        view?.hideAllStates()
         loadedIconsForView.removeAll()
         view?.update(model: AlphaModuleView.Model(items: []))
         view?.stopLoading()
-        view?.showEmpty(text: TextStatusModel.emptySearchTerm)
+        view?.showEmpty()
         isLoading = false
     }
     
-    func handleLoadedIcons(_ dataIcons: [IconDTO]) {
+    func handleLoadedIcons(_ dataIcons: [Icon]) {
         let iconsData = iconDataMapper.map(dataIcons)
+
         if iconsData.isEmpty {
-            loadedIconsForView.removeAll()
-            view?.showEmpty(text: TextStatusModel.nothingFound)
-            view?.update(model: AlphaModuleView.Model(items: []))
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.view?.stopLoading()
+                self.loadedIconsForView.removeAll()
+                self.view?.update(model: AlphaModuleView.Model(items: []))
+                self.view?.showNotFound()
+            }
         } else {
             loadedIconsForView.append(contentsOf: iconsData)
             page += 1
             updateUI()
         }
     }
+
 }

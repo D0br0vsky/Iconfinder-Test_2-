@@ -8,7 +8,7 @@ final class AlphaModuleFactory {
     func make() -> UIViewController {
         let dataLoader = DataLoader()
         let permissionManager = PermissionManager()
-        let screenStateViewModels = ScreenStateViewModels()
+        let screenStateViewModels = ScreenStateView()
         let iconDataMapper = IconDataMapper()
         let dataService = DataService(dataLoader: dataLoader)
         let iconsLoader = IconsLoader(dataService: dataService)

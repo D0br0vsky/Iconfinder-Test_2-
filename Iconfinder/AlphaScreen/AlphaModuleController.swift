@@ -2,8 +2,12 @@ import UIKit
 
 protocol AlphaControllerProtocol: AnyObject {
     func update(model: AlphaModuleView.Model)
-    func showError(text: String)
-    func showEmpty(text: String)
+    func showError()
+    func hideError()
+    func showEmpty()
+    func hideEmpty()
+    func showNotFound()
+    func hideNotFound()
     func startLoading()
     func stopLoading()
     func hideAllStates()
@@ -13,9 +17,9 @@ final class AlphaModuleController: UIViewController, UISearchBarDelegate {
     private let searchBar = UISearchBar()
     private let presenter: AlphaModulePresenter
     private lazy var customView = AlphaModuleView(presenter: presenter)
-    private let screenStateViewModels: ScreenStateViewModelsProtocol
-
-    init(presenter: AlphaModulePresenter, screenStateViewModels: ScreenStateViewModelsProtocol) {
+    private let screenStateViewModels: ScreenStateViewProtocol
+    
+    init(presenter: AlphaModulePresenter, screenStateViewModels: ScreenStateViewProtocol) {
         self.presenter = presenter
         self.screenStateViewModels = screenStateViewModels
         super.init(nibName: nil, bundle: nil)
@@ -41,13 +45,6 @@ final class AlphaModuleController: UIViewController, UISearchBarDelegate {
         searchBar.delegate = self
         navigationItem.titleView = searchBar
     }
-    
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        guard let query = searchBar.text, !query.isEmpty else { return }
-        presenter.updateQuery(query)
-        presenter.searchQueryUpdate()
-        searchBar.resignFirstResponder()
-    }
 }
 
 // MARK: - AlphaControllerProtocol
@@ -55,24 +52,59 @@ extension AlphaModuleController: AlphaControllerProtocol {
     func update(model: AlphaModuleView.Model) {
         customView.update(model: model)
     }
-    func showError(text: String) {
-        screenStateViewModels.showError(text: text)
+    
+    func showError() {
+        DispatchQueue.main.async { [self] in
+            screenStateViewModels.showError()
+        }
     }
     
-    func showEmpty(text: String) {
-        screenStateViewModels.showEmpty(text: text)
+    func hideError() {
+        DispatchQueue.main.async { [self] in
+            screenStateViewModels.hideError()
+        }
+    }
+    
+    func showEmpty() {
+        DispatchQueue.main.async { [self] in
+            screenStateViewModels.showEmpty()
+        }
+    }
+    
+    func hideEmpty() {
+        DispatchQueue.main.async { [self] in
+            screenStateViewModels.hideEmpty()
+        }
+    }
+    
+    func showNotFound() {
+        DispatchQueue.main.async { [self] in
+            screenStateViewModels.showNotFound()
+        }
+    }
+    
+    func hideNotFound() {
+        DispatchQueue.main.async { [self] in
+            screenStateViewModels.hideNotFound()
+        }
     }
     
     func startLoading() {
-        screenStateViewModels.startLoading()
+        DispatchQueue.main.async { [self] in
+            screenStateViewModels.startLoading()
+        }
     }
     
     func stopLoading() {
-        screenStateViewModels.stopLoading()
+        DispatchQueue.main.async { [self] in
+            screenStateViewModels.stopLoading()
+        }
     }
     
     func hideAllStates() {
-        screenStateViewModels.hideAllStates()
+        DispatchQueue.main.async { [self] in
+            screenStateViewModels.hideAllStates()
+        }
     }
 }
 
