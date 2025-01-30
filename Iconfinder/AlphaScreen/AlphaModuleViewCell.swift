@@ -33,7 +33,6 @@ final class AlphaModuleViewCell: UITableViewCell {
         let label = UILabel()
         label.textColor = .gray
         label.font = UIFont.systemFont(ofSize: 14.0)
-      //  label.font = UIFont.preferredFont(forTextStyle: .headline)
         label.numberOfLines = 2
         return label
     }()

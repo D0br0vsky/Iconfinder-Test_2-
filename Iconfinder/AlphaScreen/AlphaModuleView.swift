@@ -45,6 +45,14 @@ final class AlphaModuleView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func updateCell(at indexPath: IndexPath, withColor color: UIColor) {
+        DispatchQueue.main.async {
+            if let cell = self.tableView.cellForRow(at: indexPath) as? AlphaModuleViewCell {
+                cell.flashBackgroundColor(color)
+            }
+        }
+    }
+    
     func update(model: Model) {
         DispatchQueue.main.async { [weak self] in
             self?.model = model
@@ -109,7 +117,7 @@ extension AlphaModuleView: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         guard let item = model?.items[indexPath.row] else { return }
-        presenter.didTapDownloadButton(with: item.downloadURL)
+        presenter.didTapDownloadButton(with: item.downloadURL, indexPath: indexPath)
     }
 }
 

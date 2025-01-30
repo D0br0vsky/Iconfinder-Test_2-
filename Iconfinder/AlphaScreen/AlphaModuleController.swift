@@ -11,6 +11,7 @@ protocol AlphaControllerProtocol: AnyObject {
     func startLoading()
     func stopLoading()
     func hideAllStates()
+    func updateCell(at indexPath: IndexPath, withColor color: UIColor)
 }
 
 final class AlphaModuleController: UIViewController, UISearchBarDelegate {
@@ -104,6 +105,12 @@ extension AlphaModuleController: AlphaControllerProtocol {
     func hideAllStates() {
         DispatchQueue.main.async { [self] in
             screenStateViewModels.hideAllStates()
+        }
+    }
+    
+    func updateCell(at indexPath: IndexPath, withColor color: UIColor) {
+        DispatchQueue.main.async {
+            self.customView.updateCell(at: indexPath, withColor: color)
         }
     }
 }

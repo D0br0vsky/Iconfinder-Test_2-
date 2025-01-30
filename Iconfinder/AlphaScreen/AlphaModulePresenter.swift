@@ -5,7 +5,7 @@ import Dispatch
 protocol AlphaPresenterProtocol {
     var isLoading: Bool { get }
     func updateQuery(_ query: String)
-    func didTapDownloadButton(with url: String)
+    func didTapDownloadButton(with url: String, indexPath: IndexPath)
     func searchQueryUpdate()
     func loadIconsData()
 }
@@ -42,27 +42,33 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
         searchQuery = query
     }
     
-    func didTapDownloadButton(with url: String) {
+    func didTapDownloadButton(with url: String, indexPath: IndexPath) {
         permissionManager.requestPhotoLibraryPermission { [weak self] permission in
             guard permission else {
                 self?.view?.showError()
+                self?.view?.updateCell(at: indexPath, withColor: .systemRed)
                 return
             }
             
             self?.dataService.downloadImage(from: url) { [weak self] result in
                 switch result {
                 case .success(let data):
-                    guard let image = UIImage(data: data) else { return }
+                    guard let image = UIImage(data: data) else {
+                        self?.view?.updateCell(at: indexPath, withColor: .systemRed)
+                        return
+                    }
                     
                     DispatchQueue.main.async {
                         UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
-                        self?.view?.showEmpty()
+                        self?.view?.updateCell(at: indexPath, withColor: .systemGreen)
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                             self?.view?.hideEmpty()
                         }
                     }
                 case .failure(_):
                     self?.view?.showError()
+                    self?.view?.updateCell(at: indexPath, withColor: .systemRed)
+                    
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                         self?.view?.hideAllStates()
                     }
@@ -70,6 +76,7 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
             }
         }
     }
+
     
     func viewDidLoad() {
         loadIconsData()
