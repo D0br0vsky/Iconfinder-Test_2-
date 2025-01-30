@@ -32,6 +32,12 @@ final class AlphaModuleView: UIView {
         return tableView
     }()
     
+    private lazy var loadingFooterView: UIActivityIndicatorView = {
+        let loading = UIActivityIndicatorView(style: .medium)
+        loading.hidesWhenStopped = true
+        return loading
+    }()
+    
     var presenter: AlphaPresenterProtocol
     
     init(presenter: AlphaPresenterProtocol) {
@@ -50,6 +56,18 @@ final class AlphaModuleView: UIView {
             if let cell = self.tableView.cellForRow(at: indexPath) as? AlphaModuleViewCell {
                 cell.flashBackgroundColor(color)
             }
+        }
+    }
+    
+    func startLoadingFooter() {
+        loadingFooterView.startAnimating()
+        tableView.tableFooterView = loadingFooterView
+    }
+    
+    func stopLoadingFooter() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+            self?.loadingFooterView.stopAnimating()
+            self?.tableView.tableFooterView = nil
         }
     }
     
@@ -86,8 +104,8 @@ extension AlphaModuleView: UIScrollViewDelegate {
         let height = scrollView.frame.size.height
         
         if offsetY > contentHeight - height * 2, !presenter.isLoading {
-            presenter.loadIconsData()
-        }
+                presenter.loadIconsData(isPagination: true)
+            }
     }
 }
 
@@ -121,10 +139,14 @@ extension AlphaModuleView: UITableViewDelegate {
     }
 }
 
+// MARK: - Extensions Helpers ????
+
+
 // MARK: - Setup Subviews and Constraints
 private extension AlphaModuleView {
     func commonInit() {
         backgroundColor = .white
+        tableView.tableFooterView = loadingFooterView
         setupSubviews()
         setupConstraints()
     }

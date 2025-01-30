@@ -12,6 +12,8 @@ protocol AlphaControllerProtocol: AnyObject {
     func stopLoading()
     func hideAllStates()
     func updateCell(at indexPath: IndexPath, withColor color: UIColor)
+    func startLoadingFooter()
+    func stopLoadingFooter()
 }
 
 final class AlphaModuleController: UIViewController, UISearchBarDelegate {
@@ -111,6 +113,18 @@ extension AlphaModuleController: AlphaControllerProtocol {
     func updateCell(at indexPath: IndexPath, withColor color: UIColor) {
         DispatchQueue.main.async {
             self.customView.updateCell(at: indexPath, withColor: color)
+        }
+    }
+    
+    func startLoadingFooter() {
+        DispatchQueue.main.async {
+            self.customView.startLoadingFooter()
+        }
+    }
+    
+    func stopLoadingFooter() {
+        DispatchQueue.main.async {
+            self.customView.stopLoadingFooter()
         }
     }
 }

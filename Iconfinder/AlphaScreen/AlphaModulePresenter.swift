@@ -7,10 +7,11 @@ protocol AlphaPresenterProtocol {
     func updateQuery(_ query: String)
     func didTapDownloadButton(with url: String, indexPath: IndexPath)
     func searchQueryUpdate()
-    func loadIconsData()
+    func loadIconsData(isPagination: Bool)
 }
 
 final class AlphaModulePresenter: AlphaPresenterProtocol {
+    
     weak var view: AlphaControllerProtocol?
     internal var isLoading: Bool = false
     
@@ -77,12 +78,11 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
         }
     }
 
-    
     func viewDidLoad() {
         loadIconsData()
     }
     
-    func loadIconsData() {
+    func loadIconsData(isPagination: Bool = false) {
         let dispatchGroup = DispatchGroup()
         guard !isLoading, !searchQuery.isEmpty else {
             handleEmptyQuery()
@@ -90,7 +90,12 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
         }
         isLoading = true
         view?.hideAllStates()
-        view?.startLoading()
+        
+        if isPagination {
+                view?.startLoadingFooter()
+            } else {
+                view?.startLoading()
+            }
         
         dispatchGroup.enter()
         iconsLoader.loadIcons(query: searchQuery, page: page) { [weak self] result in
@@ -138,6 +143,8 @@ private extension AlphaModulePresenter {
     
     func handleEmptyQuery() {
         view?.hideAllStates()
+        view?.stopLoadingFooter()
+        view?.startLoading()
         loadedIconsForView.removeAll()
         view?.update(model: AlphaModuleView.Model(items: []))
         view?.stopLoading()
