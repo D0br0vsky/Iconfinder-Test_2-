@@ -104,8 +104,8 @@ extension AlphaModuleView: UIScrollViewDelegate {
         let height = scrollView.frame.size.height
         
         if offsetY > contentHeight - height * 2, !presenter.isLoading {
-                presenter.loadIconsData(isPagination: true)
-            }
+            presenter.loadIconsData(isPagination: true)
+        }
     }
 }
 
@@ -138,9 +138,6 @@ extension AlphaModuleView: UITableViewDelegate {
         presenter.didTapDownloadButton(with: item.downloadURL, indexPath: indexPath)
     }
 }
-
-// MARK: - Extensions Helpers ????
-
 
 // MARK: - Setup Subviews and Constraints
 private extension AlphaModuleView {
