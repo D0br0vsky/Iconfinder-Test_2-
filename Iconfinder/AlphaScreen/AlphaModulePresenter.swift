@@ -50,9 +50,7 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
             self?.dataService.downloadImage(from: url) { [weak self] result in
                 switch result {
                 case .success(let data):
-                    guard let image = UIImage(data: data) else {
-                        return
-                    }
+                    guard let image = UIImage(data: data) else { return }
                     
                     DispatchQueue.main.async {
                         UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)

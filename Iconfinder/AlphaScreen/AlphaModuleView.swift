@@ -1,6 +1,6 @@
 import UIKit
 
-final class AlphaModuleView: UIView, UICollectionViewDelegate {
+final class AlphaModuleView: UIView {
     typealias item = AlphaModuleViewCell.Model
     struct Model {
         let items: [item]
@@ -21,21 +21,15 @@ final class AlphaModuleView: UIView, UICollectionViewDelegate {
         return searchBar
     }()
     
-    private lazy var collectionView: UICollectionView  = {
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .vertical
-        layout.minimumLineSpacing = 10
-        layout.minimumInteritemSpacing = 10
-        layout.itemSize = CGSize(width: 380, height: 520)
-        layout.sectionInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
-        
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.backgroundColor = .white
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        collectionView.alwaysBounceVertical = true
-        collectionView.register(AlphaModuleViewCell.self, forCellWithReuseIdentifier: AlphaModuleViewCell.id)
-        return collectionView
+    private lazy var tableView: UITableView  = {
+        let tableView = UITableView()
+        tableView.backgroundColor = .white
+        tableView.dataSource = self
+        tableView.delegate = self
+        tableView.alwaysBounceVertical = true
+        tableView.separatorStyle = .singleLine
+        tableView.register(AlphaModuleViewCell.self, forCellReuseIdentifier: AlphaModuleViewCell.id)
+        return tableView
     }()
     
     var presenter: AlphaPresenterProtocol
@@ -55,7 +49,7 @@ final class AlphaModuleView: UIView, UICollectionViewDelegate {
         DispatchQueue.main.async { [weak self] in
             self?.model = model
             self?.data = model.items
-            self?.collectionView.reloadData()
+            self?.tableView.reloadData()
         }
     }
 }
@@ -76,7 +70,7 @@ extension AlphaModuleView: UISearchBarDelegate {
     }
 }
 
-// MARK: - UIScrollViewDelegate
+// MARK: - UIScrollViewDelegate                                                   <--------------- What?
 extension AlphaModuleView: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let offsetY = scrollView.contentOffset.y
@@ -89,24 +83,35 @@ extension AlphaModuleView: UIScrollViewDelegate {
     }
 }
 
-// MARK: - UICollectionViewDataSource
-extension AlphaModuleView: UICollectionViewDataSource {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+// MARK: - UITableViewDataSource
+extension AlphaModuleView: UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return model?.items.count ?? 0
     }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: AlphaModuleViewCell.id, for: indexPath) as? AlphaModuleViewCell else {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: AlphaModuleViewCell.id, for: indexPath) as? AlphaModuleViewCell else {
             fatalError("Failed to create AlphaModuleViewCell")
         }
         
-        guard let item = model?.items[indexPath.item] else {
-            return UICollectionViewCell()
+        guard let item = model?.items[indexPath.row] else {
+            return UITableViewCell()
         }
-
+        
         cell.update(model: item)
         cell.presenter = presenter
         return cell
+    }
+}
+
+// MARK: - UITableViewDelegate
+extension AlphaModuleView: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        
+        guard let item = model?.items[indexPath.row] else { return }
+        
+        presenter.didTapDownloadButton(with: item.downloadURL)
     }
 }
 
@@ -120,12 +125,12 @@ private extension AlphaModuleView {
     
     func setupSubviews() {
         addSubview(searchBar)
-        addSubview(collectionView)
+        addSubview(tableView)
     }
     
     private func setupConstraints() {
         searchBar.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             searchBar.topAnchor.constraint(equalTo: topAnchor, constant: 100),
@@ -133,10 +138,10 @@ private extension AlphaModuleView {
             searchBar.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
             searchBar.heightAnchor.constraint(equalToConstant: 40),
             
-            collectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 5),
-            collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: bottomAnchor)
+            tableView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 5),
+            tableView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            tableView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
     }
 }

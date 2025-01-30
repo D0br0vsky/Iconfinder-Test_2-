@@ -29,7 +29,7 @@ final class IconDataMapper: IconDataMapperProtocol {
         
         return IconsInformationModel(
             iconID: iconId,
-            maxSize: "\(sizeMaxWidth)px x \(sizeMaxHeight)px",
+            maxSize: "\(sizeMaxWidth) x \(sizeMaxHeight)",
             tags: tags,
             previewURL: previewURL,
             downloadURL: downloadURL
