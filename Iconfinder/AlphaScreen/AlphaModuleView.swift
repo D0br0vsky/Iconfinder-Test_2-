@@ -70,14 +70,14 @@ extension AlphaModuleView: UISearchBarDelegate {
     }
 }
 
-// MARK: - UIScrollViewDelegate                                                   <--------------- What?
+// MARK: - UIScrollViewDelegate
 extension AlphaModuleView: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let offsetY = scrollView.contentOffset.y
         let contentHeight = scrollView.contentSize.height
         let height = scrollView.frame.size.height
-       
-        if offsetY > contentHeight - height * 2 {
+        
+        if offsetY > contentHeight - height * 2, !presenter.isLoading {
             presenter.loadIconsData()
         }
     }
@@ -108,9 +108,7 @@ extension AlphaModuleView: UITableViewDataSource {
 extension AlphaModuleView: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        
         guard let item = model?.items[indexPath.row] else { return }
-        
         presenter.didTapDownloadButton(with: item.downloadURL)
     }
 }

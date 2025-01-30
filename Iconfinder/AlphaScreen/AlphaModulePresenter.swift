@@ -3,6 +3,7 @@ import Photos
 import Dispatch
 
 protocol AlphaPresenterProtocol {
+    var isLoading: Bool { get }
     func updateQuery(_ query: String)
     func didTapDownloadButton(with url: String)
     func searchQueryUpdate()
@@ -11,6 +12,7 @@ protocol AlphaPresenterProtocol {
 
 final class AlphaModulePresenter: AlphaPresenterProtocol {
     weak var view: AlphaControllerProtocol?
+    internal var isLoading: Bool = false
     
     private let dataLoader: DataLoaderProtocol
     private let dataService: DataServiceProtocol
@@ -20,7 +22,6 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
     
     private var loadedIconsForView: [IconsInformationModel] = []
     private var searchQuery: String = ""
-    private var isLoading: Bool = false
     private var page: Int = 1
     
     init(dataLoader: DataLoaderProtocol, dataService: DataServiceProtocol, permissionManager: PermissionManagerProtocol, iconDataMapper: IconDataMapperProtocol, iconsLoader: IconsLoaderProtocol) {
@@ -33,6 +34,7 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
     
     func searchQueryUpdate() {
         loadedIconsForView.removeAll()
+        page = 1
         loadIconsData()
     }
     
@@ -118,7 +120,7 @@ private extension AlphaModulePresenter {
             return AlphaModuleViewCell.Model(
                 previewURL: iconsData.previewURL,
                 maxSize: iconsData.maxSize,
-                tags: "\(iconsData.tags)",
+                tags: iconsData.tags.joined(separator: " | "),
                 downloadURL: iconsData.downloadURL
             )
         }
@@ -148,10 +150,13 @@ private extension AlphaModulePresenter {
                 self.view?.showNotFound()
             }
         } else {
-            loadedIconsForView.append(contentsOf: iconsData)
+            let uniqueIcons = iconsData.filter { newIcon in
+                !loadedIconsForView.contains(where: { $0.iconID == newIcon.iconID })
+            }
+            
+            loadedIconsForView.append(contentsOf: uniqueIcons)
             page += 1
             updateUI()
         }
     }
-
 }
