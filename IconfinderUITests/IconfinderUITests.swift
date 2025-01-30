@@ -21,9 +21,19 @@ final class IconfinderUITests: XCTestCase {
         searchBar.tap()
         let searchQuery = "Star"
         searchBar.typeText(searchQuery)
-        XCTAssertEqual(searchBar.value as? String, searchQuery, "The text in Usearchbar is different from the expected")
-        let element = app.collectionViews.children(matching: .cell).element(boundBy: 1).children(matching: .other).element
-        element.swipeUp()
-        element.children(matching: .other).element.swipeUp()
+        
+        XCTAssertEqual(searchBar.value as? String, searchQuery, "The text in search bar is different from the expected")
+        
+        let tableView = app.tables.firstMatch
+        for _ in 1...5 {
+            tableView.swipeUp()
+        }
+        
+        let targetCell = tableView.cells.containing(.staticText, identifier:"retro | star").staticTexts["128 x 128"]
+        if targetCell.waitForExistence(timeout: 5) {
+            targetCell.tap()
+        } else {
+            XCTFail("Целевая ячейка не найдена после прокрутки")
+        }
     }
 }
