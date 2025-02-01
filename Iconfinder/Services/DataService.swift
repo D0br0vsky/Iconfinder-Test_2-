@@ -18,7 +18,7 @@ final class DataService: DataServiceProtocol {
             return
         }
         
-        dataLoader.fetchData(url: request) { (result: Result<IconsResponse, Error>) in
+        dataLoader.fetchDecodedData(url: request) { (result: Result<IconsResponse, Error>) in
             switch result {
             case .success(let data):
                 completion(.success(data))
@@ -35,7 +35,7 @@ final class DataService: DataServiceProtocol {
             return
         }
         
-        dataLoader.fetchRawData(url: request) { result in
+        dataLoader.fetchData(url: request) { result in
             switch result {
             case .success(let data):
                 completion(.success(data))

@@ -151,7 +151,6 @@ private extension AlphaModulePresenter {
     
     func handleEmptyQuery() {
         view?.hideAllStates()
-        view?.stopLoadingFooter()
         loadedIconsForView.removeAll()
         view?.update(model: AlphaModuleView.Model(items: []))
         view?.showEmpty()

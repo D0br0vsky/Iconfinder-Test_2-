@@ -1,7 +1,6 @@
 // AppDelegate.swift
 // Iconfinder
 // Created by Dobrovsky on 20.11.2024.
-
 import UIKit
 
 @main

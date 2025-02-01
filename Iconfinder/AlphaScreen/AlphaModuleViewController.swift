@@ -90,6 +90,7 @@ extension AlphaModuleViewController: AlphaViewControllerProtocol {
     
     func hideAllStates() {
         screenStateView.hideAllStates()
+        stopLoadingFooter()
     }
     
     func updateCell(at indexPath: IndexPath, withColor color: UIColor) {
