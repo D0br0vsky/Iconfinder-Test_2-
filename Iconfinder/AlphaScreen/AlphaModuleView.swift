@@ -6,7 +6,6 @@ final class AlphaModuleView: UIView {
         let items: [item]
     }
     
-    private let debouncer = CancellableExecutor(queue: .main)
     private var data: [AlphaModuleViewCell.Model] = []
     private var model: Model?
     
@@ -27,6 +26,7 @@ final class AlphaModuleView: UIView {
         tableView.dataSource = self
         tableView.delegate = self
         tableView.alwaysBounceVertical = true
+        tableView.prefetchDataSource = self
         tableView.separatorStyle = .singleLine
         tableView.register(AlphaModuleViewCell.self, forCellReuseIdentifier: AlphaModuleViewCell.id)
         return tableView
@@ -52,13 +52,11 @@ final class AlphaModuleView: UIView {
     }
     
     func updateCell(at indexPath: IndexPath, withColor color: UIColor) {
-        DispatchQueue.main.async {
-            if let cell = self.tableView.cellForRow(at: indexPath) as? AlphaModuleViewCell {
-                cell.flashBackgroundColor(color)
-            }
+        if let cell = self.tableView.cellForRow(at: indexPath) as? AlphaModuleViewCell {
+            cell.flashBackgroundColor(color)
         }
     }
-    
+
     func startLoadingFooter() {
         loadingFooterView.startAnimating()
         tableView.tableFooterView = loadingFooterView
@@ -72,22 +70,16 @@ final class AlphaModuleView: UIView {
     }
     
     func update(model: Model) {
-        DispatchQueue.main.async { [weak self] in
-            self?.model = model
-            self?.data = model.items
-            self?.tableView.reloadData()
-        }
+        self.model = model
+        data = model.items
+        tableView.reloadData()
     }
 }
 
 // MARK: - UISearchBarDelegate
 extension AlphaModuleView: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        debouncer.execute(delay: .milliseconds(300)) { [weak self] isCancelled in
-            guard !isCancelled.isCancelled else { return }
-            self?.presenter.updateQuery(searchText)
-            self?.presenter.searchQueryUpdate()
-        }
+        presenter.handleSearchQuery(searchText)
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
@@ -97,15 +89,9 @@ extension AlphaModuleView: UISearchBarDelegate {
 }
 
 // MARK: - UIScrollViewDelegate
-extension AlphaModuleView: UIScrollViewDelegate {
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        let offsetY = scrollView.contentOffset.y
-        let contentHeight = scrollView.contentSize.height
-        let height = scrollView.frame.size.height
-        
-        if offsetY > contentHeight - height * 2, !presenter.isLoading {
-            presenter.loadIconsData(isPagination: true)
-        }
+extension AlphaModuleView: UITableViewDataSourcePrefetching {
+    func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
+        presenter.prefetchData(for: indexPaths)
     }
 }
 

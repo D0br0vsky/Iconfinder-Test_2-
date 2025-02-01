@@ -13,7 +13,7 @@ final class AlphaModuleFactory {
         let dataService = DataService(dataLoader: dataLoader)
         let iconsLoader = IconsLoader(dataService: dataService)
         let presenter = AlphaModulePresenter(dataLoader: dataLoader, dataService: dataService, permissionManager: permissionManager, iconDataMapper: iconDataMapper, iconsLoader: iconsLoader)
-        let vc = AlphaModuleController(presenter: presenter, screenStateViewModels: screenStateViewModels)
+        let vc = AlphaModuleViewController(presenter: presenter, screenStateViewModels: screenStateViewModels)
         presenter.view = vc
         return vc
     }

@@ -5,41 +5,11 @@ struct APIEndpoint {
     let queryItem: [URLQueryItem]
     
     func makeRequest() -> URLRequest? {
-        guard var components = URLComponents(string: "https://api.iconfinder.com/v4\(path)") else {
-            return nil
-        }
-        components.queryItems = queryItem
-        guard let url = components.url else {
-            return nil
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.timeoutInterval = 200
-        request.allHTTPHeaderFields = [
-            "accept": "application/json",
-            "Authorization": "Bearer JgVog6mt6EMHpy7ex9hoFOv3zcn6j85JhZBko7jVM1eLjAlJasZRSXqG7SYbvAsM"
-        ]
-        return request
+        return createRequest(urlString: "https://api.iconfinder.com/v4\(path)")
     }
     
     func makeRequestLoadingImage(loadingLink: String) -> URLRequest? {
-        guard var components = URLComponents(string: loadingLink) else {
-            return nil
-        }
-        components.queryItems = queryItem
-        guard let url = components.url else {
-            return nil
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.timeoutInterval = 200
-        request.allHTTPHeaderFields = [
-            "accept": "application/json",
-            "Authorization": "Bearer JgVog6mt6EMHpy7ex9hoFOv3zcn6j85JhZBko7jVM1eLjAlJasZRSXqG7SYbvAsM"
-        ]
-        return request
+        return createRequest(urlString: loadingLink)
     }
 }
 
@@ -54,5 +24,27 @@ extension APIEndpoint {
                 URLQueryItem(name: "vector", value: "false")
             ]
         )
+    }
+}
+
+// MARK: - Private Methods
+private extension APIEndpoint {
+    func createRequest(urlString: String) -> URLRequest? {
+        guard var components = URLComponents(string: urlString) else {
+            return nil
+        }
+        components.queryItems = queryItem
+        guard let url = components.url else {
+            return nil
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.timeoutInterval = 200
+        request.allHTTPHeaderFields = [
+            "accept": "application/json",
+            "Authorization": "Bearer \(Bundle.main.apiKey)"
+        ]
+        return request
     }
 }

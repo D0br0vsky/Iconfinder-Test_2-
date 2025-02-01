@@ -7,12 +7,14 @@ protocol AlphaPresenterProtocol {
     func updateQuery(_ query: String)
     func didTapDownloadButton(with url: String, indexPath: IndexPath)
     func searchQueryUpdate()
+    func handleSearchQuery(_ query: String)
     func loadIconsData(isPagination: Bool)
+    func prefetchData(for indexPaths: [IndexPath])
 }
 
 final class AlphaModulePresenter: AlphaPresenterProtocol {
     
-    weak var view: AlphaControllerProtocol?
+    weak var view: AlphaViewControllerProtocol?
     internal var isLoading: Bool = false
     
     private let dataLoader: DataLoaderProtocol
@@ -20,6 +22,7 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
     private let permissionManager: PermissionManagerProtocol
     private let iconDataMapper: IconDataMapperProtocol
     private let iconsLoader: IconsLoaderProtocol
+    private let debouncer = CancellableExecutor(queue: .main)
     
     private var loadedIconsForView: [IconsInformationModel] = []
     private var searchQuery: String = ""
@@ -43,6 +46,21 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
         searchQuery = query
     }
     
+    func handleSearchQuery(_ query: String) {
+        debouncer.execute(delay: .milliseconds(300)) { [weak self] isCancelled in
+            guard let self = self, !isCancelled.isCancelled else { return }
+            self.updateQuery(query)
+            self.searchQueryUpdate()
+        }
+    }
+    
+    func prefetchData(for indexPaths: [IndexPath]) {
+        let shouldLoadMore = indexPaths.contains { $0.row >= (loadedIconsForView.count - 5) }
+        if shouldLoadMore && !isLoading {
+            loadIconsData(isPagination: true)
+        }
+    }
+    
     func didTapDownloadButton(with url: String, indexPath: IndexPath) {
         permissionManager.requestPhotoLibraryPermission { [weak self] permission in
             guard permission else {
@@ -58,13 +76,10 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
                         self?.view?.updateCell(at: indexPath, withColor: .systemRed)
                         return
                     }
-                    
-                    DispatchQueue.main.async {
-                        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
-                        self?.view?.updateCell(at: indexPath, withColor: .systemGreen)
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                            self?.view?.hideEmpty()
-                        }
+                    UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+                    self?.view?.updateCell(at: indexPath, withColor: .systemGreen)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                        self?.view?.hideEmpty()
                     }
                 case .failure(_):
                     self?.view?.showError()
@@ -77,13 +92,12 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
             }
         }
     }
-
+    
     func viewDidLoad() {
         loadIconsData()
     }
     
     func loadIconsData(isPagination: Bool = false) {
-        let dispatchGroup = DispatchGroup()
         guard !isLoading, !searchQuery.isEmpty else {
             handleEmptyQuery()
             return
@@ -92,14 +106,12 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
         view?.hideAllStates()
         
         if isPagination {
-                view?.startLoadingFooter()
-            } else {
-                view?.startLoading()
-            }
+            view?.startLoadingFooter()
+        } else {
+            view?.startLoading()
+        }
         
-        dispatchGroup.enter()
         iconsLoader.loadIcons(query: searchQuery, page: page) { [weak self] result in
-            defer { dispatchGroup.leave() }
             guard let self = self else { return }
             self.isLoading = false
             self.view?.stopLoading()
@@ -112,12 +124,8 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
                 self.view?.showError()
             }
         }
-        
-        dispatchGroup.notify(queue: .main) { [weak self] in
-            guard let self = self else { return }
-            self.view?.stopLoading()
-            self.updateUI()
-        }
+        self.view?.hideAllStates()
+        self.updateUI()
     }
 }
 
@@ -127,7 +135,7 @@ private extension AlphaModulePresenter {
         guard !loadedIconsForView.isEmpty else {
             return
         }
-
+        
         let items: [AlphaModuleViewCell.Model] = loadedIconsForView.map { iconsData in
             return AlphaModuleViewCell.Model(
                 previewURL: iconsData.previewURL,
@@ -136,7 +144,7 @@ private extension AlphaModulePresenter {
                 downloadURL: iconsData.downloadURL
             )
         }
-
+        
         let viewModel = AlphaModuleView.Model(items: items)
         view?.update(model: viewModel)
     }
@@ -144,25 +152,20 @@ private extension AlphaModulePresenter {
     func handleEmptyQuery() {
         view?.hideAllStates()
         view?.stopLoadingFooter()
-        view?.startLoading()
         loadedIconsForView.removeAll()
         view?.update(model: AlphaModuleView.Model(items: []))
-        view?.stopLoading()
         view?.showEmpty()
         isLoading = false
     }
     
     func handleLoadedIcons(_ dataIcons: [Icon]) {
         let iconsData = iconDataMapper.map(dataIcons)
-
+        
         if iconsData.isEmpty {
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                self.view?.stopLoading()
-                self.loadedIconsForView.removeAll()
-                self.view?.update(model: AlphaModuleView.Model(items: []))
-                self.view?.showNotFound()
-            }
+            view?.hideAllStates()
+            loadedIconsForView.removeAll()
+            view?.update(model: AlphaModuleView.Model(items: []))
+            view?.showNotFound()
         } else {
             let uniqueIcons = iconsData.filter { newIcon in
                 !loadedIconsForView.contains(where: { $0.iconID == newIcon.iconID })

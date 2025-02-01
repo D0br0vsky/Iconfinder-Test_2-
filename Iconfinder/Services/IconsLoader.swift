@@ -13,7 +13,9 @@ final class IconsLoader: IconsLoaderProtocol {
     
     func loadIcons(query: String, page: Int, completion: @escaping (Result<IconsResponse, Error>) -> Void) {
         dataService.fetchIcons(query: query, count: 10 * page) { result in
-            completion(result)
+            DispatchQueue.main.async {
+                completion(result)
+            }
         }
     }
 }
