@@ -2,7 +2,6 @@ import Foundation
 
 protocol DataLoaderProtocol {
     func fetchData(url: URLRequest, completion: @escaping (Result<Data, Error>) -> Void)
-    func fetchDecodedData<U: Decodable>(url: URLRequest, completion: @escaping (Result<U, Error>) -> Void)
 }
 
 final class DataLoader: DataLoaderProtocol {
@@ -25,21 +24,5 @@ final class DataLoader: DataLoaderProtocol {
             completion(.success(data))
         }
         task.resume()
-    }
-    
-    func fetchDecodedData<U: Decodable>(url: URLRequest, completion: @escaping (Result<U, Error>) -> Void) {
-        fetchData(url: url) { result in
-            switch result {
-            case .success(let data):
-                do {
-                    let decodedData = try JSONDecoder().decode(U.self, from: data)
-                    completion(.success(decodedData))
-                } catch {
-                    completion(.failure(error))
-                }
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
     }
 }

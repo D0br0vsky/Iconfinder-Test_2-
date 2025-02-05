@@ -7,9 +7,11 @@ protocol DataServiceProtocol {
 
 final class DataService: DataServiceProtocol {
     private let dataLoader: DataLoaderProtocol
+    private let dataDecoder: DataDecoderProtocol
     
-    init(dataLoader: DataLoaderProtocol) {
+    init(dataLoader: DataLoaderProtocol, dataDecoder: DataDecoderProtocol) {
         self.dataLoader = dataLoader
+        self.dataDecoder = dataDecoder
     }
     
     func fetchIcons(query: String, count: Int, completion: @escaping (Result<IconsResponse, Error>) -> Void) {
@@ -18,10 +20,13 @@ final class DataService: DataServiceProtocol {
             return
         }
         
-        dataLoader.fetchDecodedData(url: request) { (result: Result<IconsResponse, Error>) in
+        dataLoader.fetchData(url: request) { [weak self] result in
+            guard let self = self else { return }
+            
             switch result {
             case .success(let data):
-                completion(.success(data))
+                let decodedResult: Result<IconsResponse, Error> = self.dataDecoder.decode(data)
+                completion(decodedResult)
             case .failure(let error):
                 completion(.failure(error))
             }

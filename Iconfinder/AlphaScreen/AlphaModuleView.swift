@@ -79,12 +79,12 @@ final class AlphaModuleView: UIView {
 // MARK: - UISearchBarDelegate
 extension AlphaModuleView: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        presenter.handleSearchQuery(searchText)
+        presenter.searchUpdate(searchText)
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchBar.resignFirstResponder()
-        presenter.updateQuery(searchBar.text ?? "")
+        presenter.searchUpdate(searchBar.text ?? "")
     }
 }
 
@@ -120,8 +120,8 @@ extension AlphaModuleView: UITableViewDataSource {
 extension AlphaModuleView: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        guard let item = model?.items[indexPath.row] else { return }
-        presenter.didTapDownloadButton(with: item.downloadURL, indexPath: indexPath)
+        guard (model?.items[indexPath.row]) != nil else { return }
+        presenter.loadsWhenTapped(indexPath: indexPath)
     }
 }
 

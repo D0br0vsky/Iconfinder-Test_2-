@@ -38,6 +38,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+				Secrets.xcconfig,
 			);
 			target = CEB8AE122CE8D17E00C8444E /* Iconfinder */;
 		};
@@ -196,7 +197,7 @@
 					APIkey,
 				);
 				LastSwiftUpdateCheck = 1600;
-				LastUpgradeCheck = 1600;
+				LastUpgradeCheck = 1620;
 				TargetAttributes = {
 					CEB8AE122CE8D17E00C8444E = {
 						CreatedOnToolsVersion = 16.0;

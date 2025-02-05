@@ -3,17 +3,12 @@ import Photos
 import Dispatch
 
 protocol AlphaPresenterProtocol {
-    var isLoading: Bool { get }
-    func updateQuery(_ query: String)
-    func didTapDownloadButton(with url: String, indexPath: IndexPath)
-    func searchQueryUpdate()
-    func handleSearchQuery(_ query: String)
-    func loadIconsData(isPagination: Bool)
+    func searchUpdate(_ query: String)
     func prefetchData(for indexPaths: [IndexPath])
+    func loadsWhenTapped(indexPath: IndexPath)
 }
 
 final class AlphaModulePresenter: AlphaPresenterProtocol {
-    
     weak var view: AlphaViewControllerProtocol?
     internal var isLoading: Bool = false
     
@@ -36,24 +31,14 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
         self.permissionManager = permissionManager
     }
     
-    func searchQueryUpdate() {
-        loadedIconsForView.removeAll()
-        page = 1
-        loadIconsData()
-    }
-    
-    func updateQuery(_ query: String) {
+    func searchUpdate(_ query: String) {
         searchQuery = query
-    }
-    
-    func handleSearchQuery(_ query: String) {
-        debouncer.execute(delay: .milliseconds(300)) { [weak self] isCancelled in
+        debouncer.execute(delay: .milliseconds(400)) { [weak self] isCancelled in
             guard let self = self, !isCancelled.isCancelled else { return }
-            self.updateQuery(query)
-            self.searchQueryUpdate()
+            searchQueryUpdate()
         }
     }
-    
+
     func prefetchData(for indexPaths: [IndexPath]) {
         let shouldLoadMore = indexPaths.contains { $0.row >= (loadedIconsForView.count - 5) }
         if shouldLoadMore && !isLoading {
@@ -61,7 +46,14 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
         }
     }
     
-    func didTapDownloadButton(with url: String, indexPath: IndexPath) {
+    func loadsWhenTapped(indexPath: IndexPath) {
+        let downloadURL = loadedIconsForView[indexPath.row].downloadURL
+        
+        guard indexPath.row < loadedIconsForView.count else {
+            view?.showError()
+            return
+        }
+        
         permissionManager.requestPhotoLibraryPermission { [weak self] permission in
             guard permission else {
                 self?.view?.showError()
@@ -69,7 +61,7 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
                 return
             }
             
-            self?.dataService.downloadImage(from: url) { [weak self] result in
+            self?.dataService.downloadImage(from: downloadURL) { [weak self] result in
                 switch result {
                 case .success(let data):
                     guard let image = UIImage(data: data) else {
@@ -91,6 +83,12 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
                 }
             }
         }
+    }
+    
+    func searchQueryUpdate() {
+        loadedIconsForView.removeAll()
+        page = 1
+        loadIconsData()
     }
     
     func viewDidLoad() {
