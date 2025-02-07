@@ -10,7 +10,6 @@ protocol AlphaPresenterProtocol {
 
 final class AlphaModulePresenter: AlphaPresenterProtocol {
     weak var view: AlphaViewControllerProtocol?
-    internal var isLoading: Bool = false
     
     private let dataLoader: DataLoaderProtocol
     private let dataService: DataServiceProtocol
@@ -21,6 +20,7 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
     
     private var loadedIconsForView: [IconsInformationModel] = []
     private var searchQuery: String = ""
+    private var isLoading: Bool = false
     private var page: Int = 1
     
     init(dataLoader: DataLoaderProtocol, dataService: DataServiceProtocol, permissionManager: PermissionManagerProtocol, iconDataMapper: IconDataMapperProtocol, iconsLoader: IconsLoaderProtocol) {
@@ -47,16 +47,16 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
     }
     
     func loadsWhenTapped(indexPath: IndexPath) {
-        let downloadURL = loadedIconsForView[indexPath.row].downloadURL
-        
         guard indexPath.row < loadedIconsForView.count else {
-            view?.showError()
+            view?.setState(.error)
             return
         }
         
+        let downloadURL = loadedIconsForView[indexPath.row].downloadURL
+        
         permissionManager.requestPhotoLibraryPermission { [weak self] permission in
             guard permission else {
-                self?.view?.showError()
+                self?.view?.setState(.error)
                 self?.view?.updateCell(at: indexPath, withColor: .systemRed)
                 return
             }
@@ -71,14 +71,13 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
                     UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
                     self?.view?.updateCell(at: indexPath, withColor: .systemGreen)
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                        self?.view?.hideEmpty()
+                        self?.view?.setState(.content)
                     }
                 case .failure(_):
-                    self?.view?.showError()
+                    self?.view?.setState(.error)
                     self?.view?.updateCell(at: indexPath, withColor: .systemRed)
-                    
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                        self?.view?.hideAllStates()
+                        self?.view?.setState(.empty)
                     }
                 }
             }
@@ -101,29 +100,26 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
             return
         }
         isLoading = true
-        view?.hideAllStates()
         
         if isPagination {
             view?.startLoadingFooter()
         } else {
-            view?.startLoading()
+            view?.setState(.loading)
         }
         
         iconsLoader.loadIcons(query: searchQuery, page: page) { [weak self] result in
             guard let self = self else { return }
-            self.isLoading = false
-            self.view?.stopLoading()
+            isLoading = false
+            view?.setState(.content)
             
             switch result {
             case .success(let dataIcons):
                 handleLoadedIcons(dataIcons.icons)
-                self.isLoading = false
+                isLoading = false
             case .failure(_):
-                self.view?.showError()
+                view?.setState(.error)
             }
         }
-        self.view?.hideAllStates()
-        self.updateUI()
     }
 }
 
@@ -134,24 +130,24 @@ private extension AlphaModulePresenter {
             return
         }
         
-        let items: [AlphaModuleViewCell.Model] = loadedIconsForView.map { iconsData in
-            return AlphaModuleViewCell.Model(
-                previewURL: iconsData.previewURL,
-                maxSize: iconsData.maxSize,
-                tags: iconsData.tags.joined(separator: " | "),
-                downloadURL: iconsData.downloadURL
+        let items = loadedIconsForView.map {
+            AlphaModuleViewCell.Model(
+                previewURL: $0.previewURL,
+                maxSize: $0.maxSize,
+                tags: $0.tags.joined(separator: " | "),
+                downloadURL: $0.downloadURL
             )
         }
-        
+
         let viewModel = AlphaModuleView.Model(items: items)
         view?.update(model: viewModel)
     }
     
     func handleEmptyQuery() {
-        view?.hideAllStates()
         loadedIconsForView.removeAll()
         view?.update(model: AlphaModuleView.Model(items: []))
-        view?.showEmpty()
+        view?.setState(.empty)
+        
         isLoading = false
     }
     
@@ -159,16 +155,11 @@ private extension AlphaModulePresenter {
         let iconsData = iconDataMapper.map(dataIcons)
         
         if iconsData.isEmpty {
-            view?.hideAllStates()
             loadedIconsForView.removeAll()
             view?.update(model: AlphaModuleView.Model(items: []))
-            view?.showNotFound()
+            view?.setState(.notFound)
         } else {
-            let uniqueIcons = iconsData.filter { newIcon in
-                !loadedIconsForView.contains(where: { $0.iconID == newIcon.iconID })
-            }
-            
-            loadedIconsForView.append(contentsOf: uniqueIcons)
+            loadedIconsForView.append(contentsOf: iconsData)
             page += 1
             updateUI()
         }

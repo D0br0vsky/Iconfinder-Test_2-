@@ -2,15 +2,7 @@ import UIKit
 
 protocol AlphaViewControllerProtocol: AnyObject {
     func update(model: AlphaModuleView.Model)
-    func showError()
-    func hideError()
-    func showEmpty()
-    func hideEmpty()
-    func showNotFound()
-    func hideNotFound()
-    func startLoading()
-    func stopLoading()
-    func hideAllStates()
+    func setState(_ state: ScreenState)
     func updateCell(at indexPath: IndexPath, withColor color: UIColor)
     func startLoadingFooter()
     func stopLoadingFooter()
@@ -52,57 +44,25 @@ final class AlphaModuleViewController: UIViewController, UISearchBarDelegate {
 
 // MARK: - AlphaViewControllerProtocol
 extension AlphaModuleViewController: AlphaViewControllerProtocol {
+    func setState(_ state: ScreenState) {
+        stopLoadingFooter()
+        screenStateView.setState(state)
+    }
+    
     func update(model: AlphaModuleView.Model) {
         customView.update(model: model)
     }
     
-    func showError() {
-        screenStateView.showError()
-    }
-    
-    func hideError() {
-        screenStateView.hideError()
-    }
-    
-    func showEmpty() {
-        screenStateView.showEmpty()
-    }
-    
-    func hideEmpty() {
-        screenStateView.hideEmpty()
-    }
-    
-    func showNotFound() {
-        screenStateView.showNotFound()
-    }
-    
-    func hideNotFound() {
-        screenStateView.hideNotFound()
-    }
-    
-    func startLoading() {
-        screenStateView.startLoading()
-    }
-    
-    func stopLoading() {
-        screenStateView.stopLoading()
-    }
-    
-    func hideAllStates() {
-        screenStateView.hideAllStates()
-        stopLoadingFooter()
-    }
-    
     func updateCell(at indexPath: IndexPath, withColor color: UIColor) {
-        self.customView.updateCell(at: indexPath, withColor: color)
+        customView.updateCell(at: indexPath, withColor: color)
     }
     
     func startLoadingFooter() {
-        self.customView.startLoadingFooter()
+        customView.startLoadingFooter()
     }
     
     func stopLoadingFooter() {
-        self.customView.stopLoadingFooter()
+        customView.stopLoadingFooter()
     }
 }
 

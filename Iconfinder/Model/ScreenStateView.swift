@@ -1,15 +1,7 @@
 import UIKit
 
 protocol ScreenStateViewProtocol: UIView {
-    func showError()
-    func hideError()
-    func showEmpty()
-    func hideEmpty()
-    func showNotFound()
-    func hideNotFound()
-    func startLoading()
-    func stopLoading()
-    func hideAllStates()
+    func setState(_ state: ScreenState)
 }
 
 final class ScreenStateView: UIView {
@@ -50,45 +42,30 @@ final class ScreenStateView: UIView {
 
 // MARK: - ScreenStateViewModelsProtocol
 extension ScreenStateView: ScreenStateViewProtocol {
-    func showError() {
+    func setState(_ state: ScreenState) {
         hideAllStates()
-        errorView.isHidden = false
-        isUserInteractionEnabled = false
-        bringSubviewToFront(errorView)
-    }
-    
-    func hideError() {
-        errorView.isHidden = true
-    }
-    
-    func showEmpty() {
-        emptyView.isHidden = false
-        isUserInteractionEnabled = false
-        bringSubviewToFront(emptyView)
-    }
-    
-    func hideEmpty() {
-        emptyView.isHidden = true
-    }
-    
-    func showNotFound() {
-        notFoundView.isHidden = false
-        isUserInteractionEnabled = false
-        bringSubviewToFront(notFoundView)
-    }
-    
-    func hideNotFound() {
-        notFoundView.isHidden = true
-    }
-    
-    func startLoading() {
-        loadingView.isHidden = false
-        isUserInteractionEnabled = false
-        bringSubviewToFront(loadingView)
-    }
-    
-    func stopLoading() {
-        loadingView.isHidden = true
+        
+        switch state {
+        case .error:
+            errorView.isHidden = false
+            isUserInteractionEnabled = false
+            bringSubviewToFront(errorView)
+        case .empty:
+            emptyView.isHidden = false
+            isUserInteractionEnabled = false
+            bringSubviewToFront(emptyView)
+        case .notFound:
+            notFoundView.isHidden = false
+            isUserInteractionEnabled = false
+            bringSubviewToFront(notFoundView)
+        case .loading:
+            loadingView.isHidden = false
+            isUserInteractionEnabled = false
+            bringSubviewToFront(loadingView)
+        case .content:
+            isUserInteractionEnabled = true
+            isUserInteractionEnabled = false
+        }
     }
     
     func hideAllStates() {
