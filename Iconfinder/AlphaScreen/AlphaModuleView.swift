@@ -139,7 +139,7 @@ private extension AlphaModuleView {
         addSubview(tableView)
     }
     
-    private func setupConstraints() {
+    func setupConstraints() {
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         tableView.translatesAutoresizingMaskIntoConstraints = false
         

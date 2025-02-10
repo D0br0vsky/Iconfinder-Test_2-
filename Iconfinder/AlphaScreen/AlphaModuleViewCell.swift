@@ -3,8 +3,8 @@ import Kingfisher
 
 final class AlphaModuleViewCell: UITableViewCell {
     static let id = "AlphaModuleViewCell"
-    
     private var model: Model?
+    
     struct Model {
         let previewURL: String
         let maxSize: String

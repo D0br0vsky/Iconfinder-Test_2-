@@ -4,6 +4,7 @@ final class CustomNavigationController: UINavigationController {
     
     override init(rootViewController: UIViewController) {
         super.init(rootViewController: rootViewController)
+        setupAppearance()
     }
     
     @available(*, unavailable)
