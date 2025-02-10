@@ -1,6 +1,6 @@
 import Foundation
 
-protocol IconDataMapperProtocol {
+protocol IconDataMapperProtocol: AnyObject {
     func map(_ dataIcons: [Icon]) -> [IconsInformationModel]
 }
 

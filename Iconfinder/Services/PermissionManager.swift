@@ -1,6 +1,6 @@
 import Photos
 
-protocol PermissionManagerProtocol {
+protocol PermissionManagerProtocol: AnyObject {
     func requestPhotoLibraryPermission(completion: @escaping (Bool) -> Void)
 }
 

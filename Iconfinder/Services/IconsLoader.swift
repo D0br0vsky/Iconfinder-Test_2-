@@ -1,6 +1,6 @@
 import Foundation
 
-protocol IconsLoaderProtocol {
+protocol IconsLoaderProtocol: AnyObject {
     func loadIcons(query: String, page: Int, completion: @escaping (Result<IconsResponse, Error>) -> Void)
 }
 

@@ -1,6 +1,6 @@
 import Foundation
 
-protocol DataLoaderProtocol {
+protocol DataLoaderProtocol: AnyObject {
     func fetchData(url: URLRequest, completion: @escaping (Result<Data, Error>) -> Void)
 }
 

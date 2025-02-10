@@ -1,6 +1,6 @@
 import Foundation
 
-protocol DataServiceProtocol {
+protocol DataServiceProtocol: AnyObject {
     func fetchIcons(query: String, count: Int, completion: @escaping (Result<IconsResponse, Error>) -> Void)
     func downloadImage(from url: String, completion: @escaping (Result<Data, Error>) -> Void)
 }

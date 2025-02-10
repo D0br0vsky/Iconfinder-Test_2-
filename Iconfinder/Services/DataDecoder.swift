@@ -1,6 +1,6 @@
 import Foundation
 
-protocol DataDecoderProtocol {
+protocol DataDecoderProtocol: AnyObject {
     func decode<U: Decodable>(_ data: Data) -> Result<U, Error>
 }
 

@@ -2,7 +2,7 @@ import UIKit
 import Photos
 import Dispatch
 
-protocol AlphaPresenterProtocol {
+protocol AlphaPresenterProtocol: AnyObject {
     func searchUpdate(_ query: String)
     func prefetchData(for indexPaths: [IndexPath])
     func loadsWhenTapped(indexPath: IndexPath)
