@@ -81,11 +81,6 @@ extension AlphaModuleView: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         presenter.searchUpdate(searchText)
     }
-    
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        searchBar.resignFirstResponder()
-        presenter.searchUpdate(searchBar.text ?? "")
-    }
 }
 
 // MARK: - UIScrollViewDelegate

@@ -25,7 +25,7 @@ final class DataService: DataServiceProtocol {
             
             switch result {
             case .success(let data):
-                let decodedResult: Result<IconsResponse, Error> = self.dataDecoder.decode(data)
+                let decodedResult: Result<IconsResponse, Error> = dataDecoder.decode(data)
                 completion(decodedResult)
             case .failure(let error):
                 completion(.failure(error))

@@ -16,7 +16,7 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
     private let permissionManager: PermissionManagerProtocol
     private let iconDataMapper: IconDataMapperProtocol
     private let iconsLoader: IconsLoaderProtocol
-    private let debouncer = CancellableExecutor(queue: .main)
+    private let debouncedIconsLoader: IconsLoaderProtocol
     
     private var loadedIconsForView: [IconsInformationModel] = []
     private var searchQuery: String = ""
@@ -24,20 +24,40 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
     private var page: Int = 1
     
     init(dataLoader: DataLoaderProtocol, dataService: DataServiceProtocol, permissionManager: PermissionManagerProtocol, iconDataMapper: IconDataMapperProtocol, iconsLoader: IconsLoaderProtocol) {
-        self.dataLoader = dataLoader
-        self.dataService = dataService
-        self.iconsLoader = iconsLoader
-        self.iconDataMapper = iconDataMapper
-        self.permissionManager = permissionManager
-    }
+            self.dataLoader = dataLoader
+            self.dataService = dataService
+            self.permissionManager = permissionManager
+            self.iconDataMapper = iconDataMapper
+            self.iconsLoader = iconsLoader
+            self.debouncedIconsLoader = DebouncedIconsLoader(iconsLoader: iconsLoader)
+        }
     
     func searchUpdate(_ query: String) {
         searchQuery = query
-        debouncer.execute(delay: .milliseconds(400)) { [weak self] isCancelled in
-            guard let self = self, !isCancelled.isCancelled else { return }
-            searchQueryUpdate()
+        loadedIconsForView.removeAll()
+        page = 1
+        
+        guard !query.isEmpty else {
+            handleEmptyQuery()
+            return
+        }
+
+        view?.setState(.loading)
+        
+        debouncedIconsLoader.loadIcons(query: query, page: page) { [weak self] result in
+            guard let self = self else { return }
+
+            switch result {
+            case .success(let dataIconsResponse):
+                self.handleLoadedIcons(dataIconsResponse.icons)
+            case .failure:
+                self.view?.setState(.error)
+            }
         }
     }
+
+
+
 
     func prefetchData(for indexPaths: [IndexPath]) {
         let shouldLoadMore = indexPaths.contains { $0.row >= (loadedIconsForView.count - 5) }
@@ -82,12 +102,6 @@ final class AlphaModulePresenter: AlphaPresenterProtocol {
                 }
             }
         }
-    }
-    
-    func searchQueryUpdate() {
-        loadedIconsForView.removeAll()
-        page = 1
-        loadIconsData()
     }
     
     func viewDidLoad() {
@@ -151,9 +165,9 @@ private extension AlphaModulePresenter {
         isLoading = false
     }
     
-    func handleLoadedIcons(_ dataIcons: [Icon]) {
+    private func handleLoadedIcons(_ dataIcons: [Icon]) {
         let iconsData = iconDataMapper.map(dataIcons)
-        
+
         if iconsData.isEmpty {
             loadedIconsForView.removeAll()
             view?.update(model: AlphaModuleView.Model(items: []))
@@ -162,6 +176,8 @@ private extension AlphaModulePresenter {
             loadedIconsForView.append(contentsOf: iconsData)
             page += 1
             updateUI()
+            view?.setState(.content)
         }
     }
+
 }

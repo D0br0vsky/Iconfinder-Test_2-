@@ -1,7 +1,7 @@
 import UIKit
 
 final class AlphaModuleFactory {
-    func make() -> UIViewController {
+    func make() -> AlphaModuleViewController {
         let dataLoader = DataLoader()
         let permissionManager = PermissionManager()
         let screenStateView = ScreenStateView()
